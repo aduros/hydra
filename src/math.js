@@ -47,9 +47,6 @@ hydra.math.min = function (a, b) {
  * @return {number}
  */
 hydra.math.random = Math.random;
-//hydra.math.random = function () {
-//    return Math.random();
-//}
 
 /**
  * @param {number} a

@@ -143,44 +143,11 @@ hydra.director.tick = function () {
     hydra.lastTime = startTime;
 }
 
-//hydra.director.FRAME_MESSAGE = "hydra-frame";
-//hydra.director.onPostMessage = function (event) {
-//    if (event.source == window && event.data == hydra.director.FRAME_MESSAGE) {
-//        var timeBegin = event.timeStamp;
-//        var elapsed = timeBegin - timeLastBegin;
-//
-//        ++fpsFrames;
-//        fpsTime += elapsed;
-//        if (fpsTime > 1000) {
-//            var fps = 1000*fpsFrames/fpsTime;
-//    //        console.log("FPS", fps.toFixed(2));
-//            fpsElement.innerText = "PostMessage FPS: " + fps.toFixed(2);
-//            fpsTime = 0;
-//            fpsFrames = 0;
-//        }
-//    //    console.log("Elapsed: " + elapsed);
-//
-//        currentScene.update(elapsed);
-//
-//    //    console.log("Update time: " + (Date.now() - timeBegin));
-//    //    console.log("Scene count: " + scenes.length);
-//
-//        timeLastBegin = timeBegin;
-//
-//        window.postMessage(hydra.director.FRAME_MESSAGE, "*");
-//    }
-//}
-
 hydra.director.init = function (scene) {
     hydra.director.pushScene(scene);
 
     hydra.lastTime = Date.now();
     setInterval(hydra.director.tick, 1); // TODO: Tone this down?
-//    window.addEventListener("message", hydra.director.onPostMessage, false);
-//    window.postMessage(hydra.director.FRAME_MESSAGE, "*");
-
-//    setInterval(tick, 0);
-    // TODO: Choose between setTimeout and setInterval
 //    hydra.director.tick();
 }
 
@@ -277,17 +244,11 @@ hydra.Entity.prototype.removeTask = function (task) {
 }
 
 hydra.Entity.prototype.removeAllTasks = function () {
+    // Can't simply clear the tasks array, all array splicing must be done in update()
     for (var ii = 0; ii < this.tasks.length; ++ii) {
         this.tasks[ii].stop(this);
         this.tasks[ii] = null;
     }
-    // Don't clear the tasks array, all array splicing must be done in update()
-
-//    this.tasks = [];
-//    if (this.tasks.length > 0 && this.scene != null) {
-//        this.scene.removeUpdatable(this);
-//        this.tasks = [];
-//    }
 }
 
 hydra.Entity.prototype.activate = function (scene) {
@@ -337,7 +298,6 @@ hydra.Entity.prototype.isActive = function () {
 
 hydra.Entity.prototype.inCurrentScene = function () {
     return this.scene == hydra.director.getCurrentScene();
-//    return this.scene && this.scene == hydra.director.getCurrentScene();
 }
 
 hydra.Entity.prototype.getScene = function () {
