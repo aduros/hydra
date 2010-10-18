@@ -1,0 +1,150 @@
+{namespace tetris.soy}
+
+/** Board layout */
+{template .scenePlaying}
+    <div class="ui-board"></div>
+    <div class="ui-preview"></div>
+    <div class="ui-score"></div>
+    <div class="ui-level"></div>
+    <div class="button-pause"></div>
+    /* <div class="button-volume"></div> */
+{/template}
+
+/** Paused scene */
+{template .scenePause}
+    <div class="label-pause">PAUSED</div>
+    <div class="button-resume button-big">Continue</div>
+    <div class="button-quit button-big">Main Menu</div>
+{/template}
+
+/**
+ * @param score
+ */
+{template .rating}
+{if $score < 10}
+    <span class="rating0">Awful</span>
+{elseif $score < 1000}
+    <span class="rating1">Weak</span>
+{elseif $score < 5000}
+    <span class="rating2">OK</span>
+{elseif $score < 12000}
+    <span class="rating3">Good</span>
+{elseif $score < 20000}
+    <span class="rating4">Super</span>
+{elseif $score < 30000}
+    <span class="rating5">Marvellous</span>
+{else}
+    <span class="rating6">Blockstar</span>
+{/if}
+{/template}
+
+/**
+ * @param score
+ * @param level
+ * @param isHighScore
+ */
+{template .sceneGameOver}
+    <div class="label-gameover">
+        <div>Score: <span class="stat">{$score}</span></div>
+        <div>Level: <span class="stat">{$level}</span></div>
+        <div>Judges say... {call .rating data="all" /}</div>
+        {if $isHighScore}
+            <div class="label-highscore">It's a new high score!</div>
+        {/if}
+    </div>
+    <div class="button-replay button-big">Replay</div>
+    <div class="button-quit button-big">Main Menu</div>
+{/template}
+
+/**
+ *
+ */
+{template .sceneMainMenu}
+    <div class="credits">by b_garcia <img src="static/twitter.png"></div>
+    <div class="ui-attract"></div>
+{/template}
+
+/**
+ *
+ */
+{template .sceneOrientation}
+Rotate your device to play!
+{/template}
+
+/** */
+{template .mainMenu}
+    <div class="mainmenu">
+        <div class="button-play button-big">Play</div>
+        <div class="button-scores button-big">Scores</div>
+    </div>
+{/template}
+
+/**
+ * @param scores
+ */
+{template .scoreMenu}
+    <div class="scoremenu">
+        {foreach $s in $scores}
+            <div class="{if isFirst($s)}label-highscore{/if}">
+                {$s.score} pts, {$s.date}
+            </div>
+        {ifempty} <div>No scores recorded yet!</div>
+        {/foreach}
+        <div class="button-back button-big">Back</div>
+    </div>
+{/template}
+
+/**
+ * @param level
+ */
+{template .levelUp}
+Level {$level}
+{/template}
+
+/**
+ *
+ */
+{template .introTouch}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Welcome to Block Dream!
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+DRAG your finger to move.
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+TAP to rotate.
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+FLICK down to drop!
+{/template}
+
+/**
+ *
+ */
+{template .introKeyboard}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Welcome to Block Dream!
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Use the arrow keys to move.
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+UP key to rotate.
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+DOWN key to drop!
+{/template}

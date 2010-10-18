@@ -1,0 +1,225 @@
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    font-weight: 700;
+    font-family: helvetica, sans-serif;
+    color: #FFF;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    display: 0;
+    margin: 0;
+}
+
+.stage {
+    width: 320px;
+    height: 416px;
+    overflow: hidden;
+    position: relative;
+}
+
+.stage * {
+    position: absolute;
+    cursor: default;
+}
+
+.button, .button * {
+    cursor: pointer !important;
+}
+
+@font-face {
+    font-family: tobec;
+    src: url(tobec.ttf);
+}
+
+.scene-playing {
+    background-image: url(chrome.jpg);
+    width: 320px;
+    height: 416px;
+}
+
+.block {
+    background-image: url(blocks.png);
+    width: 20px;
+    height: 20px;
+}
+
+.ui-preview {
+    left: 265px;
+    top: 70px;
+}
+
+.ui-score {
+    left: 220px;
+    top: 188px;
+    width: 80px;
+    color: #0f0;
+    font-family: tobec, helvetica, sans-serif;
+    font-size: 24px;
+    -webkit-transform: rotate(-4deg);
+    text-shadow: #000 0 1px;
+    text-align: right;
+}
+
+.ui-level {
+    left: 224px;
+    top: 176px;
+    width: 80px;
+    color: #FFF;
+    font-family: tobec, helvetica, sans-serif;
+    font-size: 14px;
+    -webkit-transform: rotate(-4deg);
+    text-shadow: #000 0 1px;
+}
+
+.ui-board {
+    left: 13px;
+    top: 9px;
+    width: 200px;
+    height: 400px;
+    overflow: hidden;
+}
+
+.button-pause {
+    background-image: url(pause.png);
+    width: 40px;
+    height: 40px;
+    left: 5px;
+    top: 2px;
+}
+
+.explosion {
+    background-color: #fff;
+    width: 200px;
+    height: 20px;
+}
+
+.scene-gameover, .scene-pause, .mainmenu, .scoremenu {
+    background-color: #222;
+    width: 320px;
+    text-align: center;
+    -webkit-box-shadow: #222 0 0 40px 20px;
+    padding-top: 10px;
+}
+
+.scene-gameover *, .scene-pause *, .mainmenu *, .scoremenu * {
+    position: static;
+}
+
+.label-gameover {
+    font-size: 14pt;
+}
+
+.label-highscore {
+    color: #FFD700;
+    font-size: 16pt;
+}
+
+.rating0 {
+    color: red;
+}
+
+.rating1 {
+    color: #ff8040;
+}
+
+.rating3 {
+    color: #0f0;
+}
+
+.rating4 {
+    color: #00f;
+}
+
+.rating6 {
+    color: #ff0;
+}
+
+.button-big {
+    background: #ff5c00 url(button-gradient.png) repeat-x;
+    -webkit-border-radius: 10px;
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    text-shadow: -1px -2px 2px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    font-size: 18pt;
+    margin: 20px;
+    padding: 10px 20px 11px;
+}
+
+.button-big.button-down {
+    background-color: #e33100;
+    top: 2px;
+}
+
+.button-down {
+    -webkit-transform: translate3d(0, 2px, 0);
+}
+
+.button-quit, .button-scores, .button-back {
+    background-color: #333;
+}
+
+.button-quit.button-down, .button-scores.button-down, .button-back.button-down {
+    background-color: #222;
+}
+
+.stat {
+    font-family: monospace;
+}
+
+.marquee {
+    width: 320px;
+    height: 30px;
+    background-color: #000;
+}
+
+.marquee-text {
+    white-space: nowrap;
+    font-size: 30px;
+    color: gray;
+}
+
+.credits {
+    position: absolute;
+    left: 180px;
+    top: 380px;
+    white-space: nowrap;
+    line-height: 32px;
+    color: gray;
+}
+
+.credits.button-down, .credits:hover {
+    color: #FFF;
+}
+
+.ui-attract {
+    pointer-events: none;
+}
+
+.darkness {
+    width: 320px;
+    height: 416px;
+    background-color: #000;
+}
+
+.scene-orientation {
+    width: 320px;
+    height: 416px;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
+
+.scene-orientation :first-child {
+    position: static;
+    margin-top: 100px;
+}
+
+.rating2, .rating5 {
+    color: #0ff;
+}

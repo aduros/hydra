@@ -1,0 +1,136 @@
+/******** Hydra *******/
+
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    font-weight: bold;
+    font-family: helvetica, sans-serif;
+    color: white;
+    margin: 0;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    display: -webkit-box;
+}
+
+.stage {
+    width: 320px;
+    height: 416px;
+    overflow: hidden;
+    position: relative;
+/**    background: black;*/
+    background-image: url(wood.png);
+}
+
+.stage * {
+    position: absolute;
+    cursor: default;
+}
+
+.button, .button * {
+    cursor: pointer !important;
+}
+
+#hydra-fps {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/**** APP ******/
+
+.board {
+    width: 320px;
+    height: 360px;
+    overflow: hidden;
+    background-image: url(grass.png);
+    border-bottom: 3px solid #996633;
+}
+
+.clock, .score {
+    font-size: 18pt;
+    background-color: rgba(0,0,0,0.5);
+    border: 2px solid black;
+    padding-left: 4px;
+    -webkit-border-radius: 8px;
+}
+
+.ready, .go {
+    font-weight: bold;
+    -webkit-text-stroke: 1px black;
+}
+.ready {
+    font-size: 36pt;
+    color: yellow;
+}
+.go {
+    font-size: 72pt;
+    color: lime;
+    pointer-events: none;
+}
+
+.score {
+    width: 150px;
+}
+.pause-button {
+    width: 32px;
+    height: 32px;
+    background-image: url(pause.png);
+}
+.paused {
+    font-size: 20pt;
+}
+
+.fader {
+    width: 320px;
+    height: 416px;
+    background-color: black;
+}
+
+.clock {
+    width: 60px;
+    text-align: center;
+}
+.clock-icon {
+    width: 32px;
+    height: 32px;
+    background-image: url(clock.png);
+}
+
+.block0 {
+    background-image: url(bug40.png);
+    width: 40px;
+    height: 40px;
+}
+
+.block1 {
+    background-image: url(banana40.png);
+    width: 40px;
+    height: 40px;
+}
+.block2 {
+    background-image: url(orange40.png);
+    width: 40px;
+    height: 40px;
+}
+.block3 {
+    background-image: url(grapes40.png);
+    width: 40px;
+    height: 40px;
+}
+.block4 {
+    background-image: url(lemon40.png);
+    width: 40px;
+    height: 40px;
+}
+.block5 {
+    background-image: url(tomato40.png);
+    width: 40px;
+    height: 40px;
+}

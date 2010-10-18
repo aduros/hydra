@@ -1,0 +1,3 @@
+[submodule "closure"]
+	path = closure
+	url = http://github.com/jarib/google-closure-library.git
