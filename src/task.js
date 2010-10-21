@@ -156,26 +156,12 @@ hydra.task.Sequence.prototype.stop = function (entity) {
         var task = this.tasks[this.idx];
         task.stop(entity);
     }
-    // TODO: Need to stop all tasks or just the current one?
-//    for (var ii = 0; ii < this.task.length; ++ii) {
-//        var task = this.tasks[ii];
-//        if (task.stop) {
-//            task.stop(entity);
-//        }
-//    }
 }
 
 hydra.task.Sequence.prototype.start = function (entity) {
     if (this.idx < this.tasks.length) {
         this.tasks[this.idx].start(entity);
     }
-//    // TODO: Need to start all tasks or just the current one?
-//    for (var ii = 0; ii < this.task.length; ++ii) {
-//        var task = this.tasks[ii];
-//        if (task.start) {
-//            task.start(entity);
-//        }
-//    }
 }
 
 hydra.task.Sequence.prototype.update = function (dt, entity) {
