@@ -7,10 +7,10 @@ goog.require("hydra.dom");
 /**
  * @constructor
  * @extends hydra.Sprite
- * @param {Element|hydra.Pool} source
+ * @param {Element=} element
  */
-hydra.Button = function (source) {
-    goog.base(this, source);
+hydra.Button = function (element) {
+    goog.base(this, element);
 
     /**
      * @private

@@ -11,35 +11,22 @@ goog.provide("hydra.task.RotateBy");
 goog.require("hydra.dom");
 goog.require("hydra.interpolators");
 goog.require("hydra.array");
-goog.require("hydra.Pool");
 //goog.require("hydra.Entity");
 goog.require("hydra.dom");
 
 /**
  * @constructor
  * @extends hydra.Entity
- * @param {Element|string|hydra.Pool=} source
+ * @param {Element=} element
  */
-hydra.Sprite = function (source) {
+hydra.Sprite = function (element) {
     goog.base(this);
-
-    if (!source) {
-        source = document.createElement("div");
-
-    } else if (source instanceof hydra.Pool) {
-        /** 
-         * @protected
-         * @type {hydra.Pool}
-         */
-        this.pool = source;
-        source = source.alloc();
-    }
 
     /**
      * //@protected
      * @type {HTMLElement}
      */
-    this.element = source;
+    this.element = /** @type {HTMLElement} */ (element || document.createElement("div"));
 
     /**
      * @protected
@@ -79,19 +66,11 @@ hydra.Sprite = function (source) {
 }
 goog.inherits(hydra.Sprite, hydra.Entity);
 
-hydra.Sprite.DIV_POOL = new hydra.Pool();
-hydra.Sprite.DIV_POOL.createObject = function () {
-    return document.createElement("div");
-}
-hydra.Sprite.DIV_POOL.destroyObject = function (div) {
-    div.parentNode.removeChild(div);
-}
-
 /**
  * @param {string} className
  */
 hydra.Sprite.div = function (className) {
-    var sprite = new hydra.Sprite(hydra.Sprite.DIV_POOL);
+    var sprite = new hydra.Sprite();
     sprite.element.className = className;
     return sprite;
 }
@@ -99,9 +78,6 @@ hydra.Sprite.div = function (className) {
 hydra.Sprite.prototype.detach = function () {
     if (this.parent) {
         this.parent.removeSprite(this);
-
-    } else if (this.pool) {
-        this.element.style.visibility = "hidden";
 
     } else if (this.element.parentNode) {
         this.element.parentNode.removeChild(this.element);
@@ -112,17 +88,7 @@ hydra.Sprite.prototype.detach = function () {
 hydra.Sprite.prototype.destroy = function () {
     goog.base(this, "destroy");
 
-    if (this.pool) {
-        // Clean up the element and return it to the pool
-        this.element.removeAttribute("style");
-        if (this.element.hasChildNodes()) {
-            this.element.innerHTML = "";
-        }
-        this.detach();
-        this.pool.free(this.element);
-    } else {
-        this.detach();
-    }
+    this.detach();
     this.element = null;
 }
 
@@ -205,10 +171,10 @@ hydra.Sprite.prototype.pageToLocal = function (pageX, pageY) {
 /**
  * @constructor
  * @extends hydra.Sprite
- * @param {Element|hydra.Pool=} source
+ * @param {Element=} element
  */
-hydra.Group = function (source) {
-    goog.base(this, source);
+hydra.Group = function (element) {
+    goog.base(this, element);
 
     /**
      * @private

@@ -15,7 +15,6 @@ Hydra aims to be fast:
 
 * Animations are implemented as CSS transitions, which can be hardware accelerated.
 * All game updates are performed on a single setInterval callback.
-* Sprites can be pooled, avoiding costly construction and removal of DOM elements.
 * Games are compiled with Google's Closure Compiler in "advanced" mode, allowing aggressive inlining and dead-code elimination.
 
 Hydra also aims to be functional:

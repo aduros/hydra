@@ -5,6 +5,7 @@ goog.require("hydra.array");
 /**
  * @constructor
  * @extends hydra.Entity
+ * @deprecated
  */
 hydra.Pool = function () {
     goog.base(this);
