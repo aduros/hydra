@@ -23,8 +23,10 @@ hydra.Pool.prototype.destroyObject = function (o) { }
 
 hydra.Pool.prototype.alloc = function () {
     if (this.freeObjects != null && this.freeObjects.length > 0) {
+        console.log("Reusing from pool", "size=", this.freeObjects.length);
         return this.freeObjects.pop();
     } else {
+        console.log("Creating new object");
         return this.createObject();
     }
 }
