@@ -1,4 +1,4 @@
-HYDRA_HOME = "../.."; # TODO: Find some way to just use the dir of this file
+HYDRA_HOME = File.dirname(__FILE__);
 
 LIBS = [
     HYDRA_HOME + "/closure",
