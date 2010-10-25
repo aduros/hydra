@@ -390,7 +390,7 @@ hydra.Scene.prototype.removeUpdatable = function (updatable) {
 // FIXME: Sprites shouldn't be put on the dom until this scene is entered
 hydra.Scene.prototype.addEntity = function (entity, parent) {
     // TODO: Figure out once and for all if entities can be reused between scenes
-    if (!entity.isActive()) {
+    if (!entity.scene) {
         hydra.array.push(this.entities, entity);
         entity.activate(this);
         if (entity instanceof hydra.Sprite) {

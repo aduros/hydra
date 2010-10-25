@@ -50,7 +50,7 @@ html, body {
     height: 360px;
     overflow: hidden;
     background-image: url(grass.png);
-    border-bottom: 3px solid #996633;
+    border-top: 3px solid #996633;
 }
 
 .clock, .score {
@@ -133,4 +133,11 @@ html, body {
     background-image: url(tomato40.png);
     width: 40px;
     height: 40px;
+}
+
+.floater {
+    color: #0f0;
+    font-size: 24pt;
+    pointer-events: none;
+    -webkit-text-stroke: 1px black;
 }

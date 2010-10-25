@@ -18,6 +18,7 @@ jam.BoardSprite = function () {
     this.registerListener(jam.ctx.board, jam.BoardEvent.GAME_STARTED, goog.bind(this.onGameStart, this));
     this.registerListener(jam.ctx.board, jam.BoardEvent.PATH_CLEARED, goog.bind(this.onPathCleared, this));
     this.registerListener(jam.ctx.board, jam.BoardEvent.PATH_CANCELED, goog.bind(this.onPathCanceled, this));
+    this.registerListener(jam.ctx.board, jam.BoardEvent.SCORE_CHANGED, goog.bind(this.onScoreChanged, this));
     this.registerListener(this.element, "touchstart", goog.bind(this.onTouchMove, this));
     this.registerListener(this.element, "touchmove", goog.bind(this.onTouchMove, this));
     this.registerListener(this.element, "touchend", goog.bind(this.onTouchEnd, this));
@@ -57,7 +58,8 @@ jam.BoardSprite.prototype.onGameStart = function () {
     for (var y = 0; y < jam.Board.HEIGHT; ++y) {
         for (var x = 0; x < jam.Board.WIDTH; ++x) {
             var block = jam.ctx.board.getBlockAt(x, y);
-            var sprite = new hydra.Sprite(hydra.dom.div("block" + block));
+//            var sprite = new hydra.Sprite(hydra.dom.div("block" + block));
+            var sprite = hydra.Sprite.div("block" + block);
             sprite.setXY(jam.BoardSprite.BLOCK_SIZE*x, jam.BoardSprite.BLOCK_SIZE*y);
 
             this.addSprite(sprite);
@@ -70,16 +72,19 @@ jam.BoardSprite.prototype.onGameStart = function () {
 jam.BoardSprite.prototype.onPathCleared = function () {
     var path = jam.ctx.board.pathList;
     var pathMask = {};
-    for (var ii = 0; ii < path.length; ++ii) {
+    for (var ii = 0, ll = path.length; ii < ll; ++ii) {
         var block = this.blockSprites[path[ii]];
         pathMask[path[ii]] = true;
         block.removeAllTasks();
         block.element.style.backgroundColor = ""; // Reset style
         block.addTask(new hydra.task.Sequence([
-            hydra.task.ScaleTo.linear(0, 0, 0.1),
+            new hydra.task.Delay((ll-ii)*0.1),
+            hydra.task.ScaleTo.linear(0, 0, 0.15),
             new hydra.task.SelfDestruct()
         ]));
     }
+
+    var fallDelay = 0.1*ll;
 
     for (var x = 0; x < jam.Board.WIDTH; ++x) {
         var drop = 0;
@@ -99,22 +104,21 @@ jam.BoardSprite.prototype.onPathCleared = function () {
                     var sprite = this.blockSprites[p];
                     var newP = p + drop*jam.Board.WIDTH;
 
+                    var tasks = [
+                        new hydra.task.Delay(fallDelay),
+                        hydra.task.MoveTo.easeIn(x*jam.BoardSprite.BLOCK_SIZE, (y+drop)*jam.BoardSprite.BLOCK_SIZE, drop*0.2)
+                    ];
+
                     // Copy down
                     if (newP > jam.Board.WIDTH*jam.Board.HEIGHT) {
                         // Move skulls off screen
-                        sprite.removeAllTasks();
-                        sprite.addTask(new hydra.task.Sequence([
-                            hydra.task.MoveTo.linear(x*jam.BoardSprite.BLOCK_SIZE, (y+drop)*jam.BoardSprite.BLOCK_SIZE, drop*0.2),
-                            new hydra.task.SelfDestruct()
-                        ]));
+                        tasks.push(new hydra.task.SelfDestruct());
                     } else {
                         this.blockSprites[newP] = sprite;
                         jam.ctx.board.blocks[newP] = block; // Update the model in a view, yeah yeah, hack
-
-                        sprite.removeAllTasks();
-                        sprite.addTask(hydra.task.MoveTo.linear(
-                            x*jam.BoardSprite.BLOCK_SIZE, (y+drop)*jam.BoardSprite.BLOCK_SIZE, drop*0.2));
                     }
+                    sprite.removeAllTasks();
+                    sprite.addTask(new hydra.task.Sequence(tasks));
                 }
             }
         }
@@ -124,10 +128,13 @@ jam.BoardSprite.prototype.onPathCleared = function () {
             var newBlock = jam.ctx.board.randomBlock();
             jam.ctx.board.blocks[p] = newBlock;
 
-            var newSprite = new hydra.Sprite(hydra.dom.div("block"+newBlock));
+//            var newSprite = new hydra.Sprite(hydra.dom.div("block"+newBlock));
+            var newSprite = hydra.Sprite.div("block"+newBlock);
             newSprite.setXY(x*jam.BoardSprite.BLOCK_SIZE, -(drop-y)*jam.BoardSprite.BLOCK_SIZE);
-            newSprite.addTask(hydra.task.MoveTo.linear(
-                x*jam.BoardSprite.BLOCK_SIZE, y*jam.BoardSprite.BLOCK_SIZE, drop*0.2));
+            newSprite.addTask(new hydra.task.Sequence([
+                new hydra.task.Delay(fallDelay),
+                hydra.task.MoveTo.easeIn(x*jam.BoardSprite.BLOCK_SIZE, y*jam.BoardSprite.BLOCK_SIZE, drop*0.2)
+            ]));
 
             this.addSprite(newSprite);
             this.blockSprites[p] = newSprite;
@@ -191,4 +198,20 @@ jam.BoardSprite.prototype.onTouchEnd = function (event) {
     }
     jam.ctx.board.submitPath();
     this.lastTouch = null;
+}
+
+jam.BoardSprite.prototype.onScoreChanged = function (delta) {
+    if (delta > 0) {
+        var floater = hydra.Sprite.div("floater");
+        floater.element.innerText = "+" + delta;
+        floater.addTask(new hydra.task.Sequence([
+            hydra.task.MoveBy.linear(0, -20, 1),
+            new hydra.task.SelfDestruct()
+        ]));
+        this.addSprite(floater);
+        // clientWidth/height only available when added to the document
+        var width = floater.element.clientWidth;
+        floater.setXY(hydra.math.clamp(this.lastTouch.x - width/2, 0, 320 - width),
+            this.lastTouch.y - floater.element.clientHeight/2);
+    }
 }

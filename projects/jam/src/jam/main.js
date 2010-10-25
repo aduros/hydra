@@ -25,8 +25,10 @@ if (!hydra.simulator.supportsTouch) {
 }
 
 if (!goog.DEBUG) {
-    goog.require("hydra.analytics");
-    hydra.analytics.init("UA-9490853-6");
+    //goog.require("hydra.analytics");
+    //hydra.analytics.init("UA-9490853-6");
+    goog.require("hydra.kissmetrics");
+    hydra.kissmetrics.init("ef41cc33ba86d1908aaf811e03990d5ef8ef4a81");
 }
 
 goog.require("jam.PlayingScene");
@@ -44,11 +46,11 @@ hydra.director.init(new jam.PlayingScene());
 //intro.addEntity(darkness);
 //hydra.director.pushScene(intro);
 //
-//// Orientation handling
+// Orientation handling
 //function onOrientationChanged () {
-//    if (tetris.OrientationScene.shouldWarn() & !(hydra.director.getCurrentScene() instanceof tetris.OrientationScene)) {
-//        hydra.director.pushScene(new tetris.OrientationScene());
-//    }
+//   if (tetris.OrientationScene.shouldWarn() & !(hydra.director.getCurrentScene() instanceof tetris.OrientationScene)) {
+//       hydra.director.pushScene(new tetris.OrientationScene());
+//   }
 //}
 //window.addEventListener("orientationchange", onOrientationChanged, false);
 //onOrientationChanged();

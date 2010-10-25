@@ -9,6 +9,7 @@ hydra.analytics.init = function (account) {
         ];
         var script = document.createElement("script");
         script.src = "http://www.google-analytics.com/ga.js";
+        script.async = true;
         // TODO: Clear _gaq if error during loading
         document.body.appendChild(script);
     }

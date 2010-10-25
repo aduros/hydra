@@ -284,11 +284,13 @@ hydra.task.NativeTransition.State = {
 
 /**
  * @param {hydra.Sprite} sprite
+ * @protected
  */
 hydra.task.NativeTransition.prototype.begin = goog.abstractMethod;
 
 /**
  * @param {hydra.Sprite} sprite
+ * @protected
  */
 hydra.task.NativeTransition.prototype.progress = function (sprite) { }
 

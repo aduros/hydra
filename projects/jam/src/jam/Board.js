@@ -86,19 +86,11 @@ jam.Board.prototype.randomBlock = function () {
 jam.Board.prototype.submitPath = function () {
     if (this.pathList.length > 1) {
         this.dispatchEvent(jam.BoardEvent.PATH_CLEARED);
-//        var bonus = Math.pow(this.pathList.length, 1.6)
-        var bonus = hydra.math.toInt(Math.pow(this.pathList.length, 1.6));
-        this.score += bonus;
-        var bonusTime = 1000 * this.pathList.length*this.pathList.length/Math.pow(this.score, 0.6);
-//            (this.pathList.length*this.pathList.length) / Math.sqrt(this.score);
-//        var bonusTime = 5*1000*bonus/Math.sqrt(this.score);
-        this.gameOverTime += bonusTime;
-//        console.log("Adding time", (bonusTime/1000));
-        var now = Date.now();
-        if (this.gameOverTime > now+jam.Board.MAX_TIME) {
-            this.gameOverTime = now+jam.Board.MAX_TIME;
-        }
-        this.dispatchEvent(jam.BoardEvent.SCORE_CHANGED);
+
+        var delta = 50*hydra.math.toInt(Math.pow(this.pathList.length, 1.6));
+        this.score += delta;
+
+        this.dispatchEvent(jam.BoardEvent.SCORE_CHANGED, delta);
     } else {
         this.dispatchEvent(jam.BoardEvent.PATH_CANCELED);
     }

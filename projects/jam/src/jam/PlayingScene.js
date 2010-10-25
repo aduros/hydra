@@ -20,7 +20,7 @@ jam.PlayingScene.prototype.load = function () {
     jam.ctx.board = new jam.Board();
 
     this.clock = new hydra.Sprite(hydra.dom.div("clock"));
-    this.clock.setXY(200, 370);
+    this.clock.setXY(200, 10);
     var self = this;
     this.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
         new hydra.task.Delay(1),
@@ -28,20 +28,20 @@ jam.PlayingScene.prototype.load = function () {
             self.updateClock();
         })
     ])));
-    this.clock.registerListener(jam.ctx.board, jam.BoardEvent.SCORE_CHANGED, goog.bind(this.updateScore, this));
+    this.clock.registerListener(jam.ctx.board, jam.BoardEvent.SCORE_CHANGED, goog.bind(this.onScoreChanged, this));
     this.clock.registerListener(jam.ctx.board, jam.BoardEvent.GAME_OVER, goog.bind(this.onGameOver, this));
     this.addEntity(this.clock);
 
     this.score = new hydra.Sprite(hydra.dom.div("score"));
-    this.score.setXY(32, 370);
+    this.score.setXY(32, 10);
     this.addEntity(this.score);
 
     var clockIcon = new hydra.Sprite(hydra.dom.div("clock-icon"));
-    clockIcon.setXY(320-40, 370);
+    clockIcon.setXY(320-40, 10);
     this.addEntity(clockIcon);
 
     var pauseButton = new hydra.Button(hydra.dom.div("pause-button"));
-    pauseButton.setXY(0, 370);
+    pauseButton.setXY(0, 10);
     pauseButton.onTap = function () {
         var pauseScene = new hydra.Scene("pause");
         var fader = new hydra.Group(hydra.dom.div("fader"));
@@ -69,6 +69,7 @@ jam.PlayingScene.prototype.load = function () {
 //    jam.ctx.board.startGame();
 
     var board = new jam.BoardSprite();
+    board.setY(56-3);
     this.addEntity(board);
 
     var interstitial = new hydra.Scene("interstitial");
@@ -97,21 +98,15 @@ jam.PlayingScene.prototype.load = function () {
     hydra.director.pushScene(interstitial);
 }
 
-jam.PlayingScene.prototype.updateScore = function () {
+jam.PlayingScene.prototype.onScoreChanged = function () {
     if (jam.ctx.board.pathList.length) {
         this.score.removeAllTasks();
         this.score.addTask(new hydra.task.Sequence([
             hydra.task.ScaleTo.easeOut(1.2, 1.2, 0.1),
             hydra.task.ScaleTo.easeIn(1, 1, 0.1)
         ]));
-        this.clock.addTask(new hydra.task.Sequence([
-            new hydra.task.SetCss("color", "yellow"),
-            new hydra.task.Delay(0.1),
-            new hydra.task.SetCss("color", "")
-        ]));
     }
-    this.score.element.innerText = String(jam.ctx.board.score*53);
-    this.updateClock();
+    this.score.element.innerText = String(jam.ctx.board.score);
 }
 
 jam.PlayingScene.prototype.updateClock = function () {
@@ -120,6 +115,9 @@ jam.PlayingScene.prototype.updateClock = function () {
         var mins = hydra.math.toInt(remaining / 60);
         var secs = remaining % 60;
         this.clock.element.innerText = mins + ((secs > 9) ? ":" : ":0") + secs;
+        if (remaining < 10) {
+            this.clock.setCss("color", "red");
+        }
     } else {
         jam.ctx.board.endGame();
     }
@@ -132,8 +130,8 @@ jam.PlayingScene.prototype.onGameOver = function () {
         jam.ctx.account["best"] = best;
         jam.ctx.saveAccount();
     }
-    alert("Game over! You scored " + 53*jam.ctx.board.score +
-        ", your personal best is " + 53*best + "." +
+    alert("Game over! You scored " + jam.ctx.board.score +
+        ", your personal best is " + best + "." +
         "\n" +
         "\n" +
         "Bruno Garcia built this for a 2 day game jam.");
