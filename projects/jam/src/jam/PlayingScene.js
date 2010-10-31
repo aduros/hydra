@@ -25,11 +25,15 @@ jam.PlayingScene.prototype.load = function () {
     this.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
         new hydra.task.Delay(1),
         new hydra.task.CallFunction(function () {
+            ++jam.ctx.board.elapsed;
             self.updateClock();
         })
     ])));
     this.clock.registerListener(jam.ctx.board, jam.BoardEvent.SCORE_CHANGED, goog.bind(this.onScoreChanged, this));
     this.clock.registerListener(jam.ctx.board, jam.BoardEvent.GAME_OVER, goog.bind(this.onGameOver, this));
+    this.clock.registerListener(jam.ctx.board, jam.BoardEvent.GAME_STARTED, function () {
+        self.updateClock();
+    });
     this.addEntity(this.clock);
 
     this.score = new hydra.Sprite(hydra.dom.div("score"));
@@ -44,11 +48,11 @@ jam.PlayingScene.prototype.load = function () {
         } else {
             jam.ctx.music.pause();
         }
-        //jam.ctx.account["mute"] = !oldValue;
-        //jam.ctx.saveAccount();
+        jam.ctx.account["mute"] = !oldValue;
+        jam.ctx.saveAccount();
         muteButton.setToggled(!oldValue);
     }
-    //muteButton.setToggled(shouldMute);
+    muteButton.setToggled(jam.ctx.account["mute"]);
     muteButton.setXY(320-40-8, 10);
     this.addEntity(muteButton);
 
@@ -71,7 +75,13 @@ jam.PlayingScene.prototype.load = function () {
         var label = new hydra.Sprite(hydra.dom.div("paused"));
         label.element.innerText = "PAUSED";
         label.setXY(320, 416/2-50);
-        label.addTask(hydra.task.MoveTo.easeOut(320/2-80, 416/2-50, 1));
+        label.addTask(new hydra.task.Sequence([
+            hydra.task.MoveTo.easeOut(320/2-80, 416/2-50, 1),
+            new hydra.task.Repeat(new hydra.task.Sequence([
+                hydra.task.ScaleTo.easeIn(1.2, 1, 0.5),
+                hydra.task.ScaleTo.easeOut(1, 1, 0.5)
+            ]))
+        ]));
         fader.addSprite(label);
 
         hydra.director.pushScene(pauseScene);
@@ -89,16 +99,28 @@ jam.PlayingScene.prototype.load = function () {
     ready.setXY(60, 0);
     ready.element.innerText = "Ready...";
     ready.element.style.opacity = "0";
-    ready.addTask(hydra.task.AnimateCss.linear("opacity", "1", 1));
     ready.addTask(new hydra.task.Sequence([
-        hydra.task.MoveTo.linear(60, 416/3, 2),
+        new hydra.task.Parallel([
+            hydra.task.MoveTo.linear(60, 416/2, 3),
+            new hydra.task.Sequence([
+                hydra.task.AnimateCss.easeIn("opacity", "1", 1),
+                new hydra.task.Delay(1.5),
+                hydra.task.AnimateCss.easeOut("opacity", "0", 0.5)
+            ])
+        ]),
         new hydra.task.CallFunction(function () {
             var go = new hydra.Sprite(hydra.dom.div("go"));
             go.element.innerText = "GO!";
-            go.setXY(60, 416/3);
-            go.setScale(0.5);
+            go.setXY(40, 416/3);
+            go.setScale(0.25);
             go.addTask(new hydra.task.Sequence([
-                hydra.task.ScaleTo.easeOut(1, 1, 0.5),
+                new hydra.task.Parallel([
+                    hydra.task.ScaleTo.easeOut(1, 1, 1),
+                    new hydra.task.Sequence([
+                        new hydra.task.Delay(0.5),
+                        hydra.task.AnimateCss.linear("opacity", "0", 0.5)
+                    ])
+                ]),
                 new hydra.task.SelfDestruct()
             ]));
             self.addEntity(go);
@@ -126,7 +148,7 @@ jam.PlayingScene.prototype.onScoreChanged = function () {
 }
 
 jam.PlayingScene.prototype.updateClock = function () {
-    var remaining = hydra.math.toInt((jam.ctx.board.gameOverTime - Date.now())/1000);
+    var remaining = 2*60 - jam.ctx.board.elapsed;
     if (remaining >= 0) {
         var mins = hydra.math.toInt(remaining / 60);
         var secs = remaining % 60;
@@ -146,10 +168,9 @@ jam.PlayingScene.prototype.onGameOver = function () {
         jam.ctx.account["best"] = best;
         jam.ctx.saveAccount();
     }
-    alert("Game over! You scored " + jam.ctx.board.score +
-        ", your personal best is " + best + "." +
+    alert("Game over! You scored " + jam.ctx.board.score + " points." +
         "\n" +
         "\n" +
-        "Bruno Garcia built this for a 2 day game jam.");
+        "Your personal best is " + best + " points.");
     hydra.director.unwindToScene(new jam.PlayingScene());
 }

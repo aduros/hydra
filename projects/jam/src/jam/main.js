@@ -34,32 +34,35 @@ if (!goog.DEBUG) {
 
 goog.require("jam.PlayingScene");
 goog.require("jam.MainMenuScene");
-//goog.require("tetris.OrientationScene");
+goog.require("jam.OrientationScene");
 
 hydra.director.init(new jam.MainMenuScene());
 
 jam.ctx.music = hydra.sound.play("static/music.mp3");
+if (jam.ctx.account["mute"]) {
+    jam.ctx.music.pause();
+}
 // Loop property doesn't work on iOS
 jam.ctx.music.addEventListener("ended", HTMLAudioElement.prototype.play, false);
 
-//// Fade in
-//var intro = new hydra.Scene("intro");
-//var darkness = new hydra.Sprite(hydra.dom.div("darkness"));
-//darkness.addTask(new hydra.task.Sequence([
-//    hydra.task.AnimateCss.easeIn("opacity", "0", 1),
-//    new hydra.task.CallFunction(hydra.director.popScene)
-//]));
-//intro.addEntity(darkness);
-//hydra.director.pushScene(intro);
-//
+// Fade in
+var intro = new hydra.Scene("intro");
+var darkness = new hydra.Sprite(hydra.dom.div("darkness"));
+darkness.addTask(new hydra.task.Sequence([
+   hydra.task.AnimateCss.easeIn("opacity", "0", 1),
+   new hydra.task.CallFunction(hydra.director.popScene)
+]));
+intro.addEntity(darkness);
+hydra.director.pushScene(intro);
+
 // Orientation handling
-//function onOrientationChanged () {
-//   if (tetris.OrientationScene.shouldWarn() & !(hydra.director.getCurrentScene() instanceof tetris.OrientationScene)) {
-//       hydra.director.pushScene(new tetris.OrientationScene());
-//   }
-//}
-//window.addEventListener("orientationchange", onOrientationChanged, false);
-//onOrientationChanged();
+function onOrientationChanged () {
+    if (jam.OrientationScene.shouldWarn() & !(hydra.director.getCurrentScene() instanceof jam.OrientationScene)) {
+        hydra.director.pushScene(new jam.OrientationScene());
+    }
+}
+window.addEventListener("orientationchange", onOrientationChanged, false);
+onOrientationChanged();
 
 // Safari hacks
 // Looks like android requires it too

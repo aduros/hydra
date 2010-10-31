@@ -70,9 +70,15 @@ html, body {
     color: yellow;
 }
 .go {
-    font-size: 72pt;
+    font-size: 100pt;
     color: lime;
     pointer-events: none;
+}
+
+.darkness {
+    background-color: black;
+    width: 320px;
+    height: 416px;
 }
 
 .score {
@@ -84,7 +90,7 @@ html, body {
     background-image: url(pause.png);
 }
 .paused {
-    font-size: 20pt;
+    font-size: 30pt;
 }
 
 .fader {
@@ -158,9 +164,9 @@ html, body {
     position: static;
 }
 
-.ui-attract {
-    pointer-events: none;
-}
+/*.ui-attract {*/
+/*    pointer-events: none;*/
+/*}*/
 
 .credits {
     position: absolute;
@@ -170,11 +176,15 @@ html, body {
     line-height: 32px;
     color: gray;
 }
+.credits.button-down {
+    color: white;
+}
 
 .logo {
     background-image: url(logo.png);
     width: 320px;
     height: 413px;
+    pointer-events: none;
 }
 
 .punch-button {
@@ -214,4 +224,16 @@ html, body {
 
 .mute-button.button-down {
     background-image: url(volume-mute.png);
+}
+
+.scene-orientation {
+    width: 320px;
+    height: 416px;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
+
+.scene-orientation :first-child {
+    position: static;
+    margin-top: 100px;
 }

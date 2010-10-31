@@ -446,6 +446,16 @@ hydra.task.AnimateCss.easeIn = function (cssProperty, value, duration, spriteOve
     return new hydra.task.AnimateCss(cssProperty, value, duration, "ease-in", spriteOverride);
 }
 
+/**
+ * @param {string} cssProperty
+ * @param {string} value
+ * @param {number} duration
+ * @param {hydra.Sprite=} spriteOverride
+ */
+hydra.task.AnimateCss.easeOut = function (cssProperty, value, duration, spriteOverride) {
+    return new hydra.task.AnimateCss(cssProperty, value, duration, "ease-out", spriteOverride);
+}
+
 /** @override */
 hydra.task.AnimateCss.prototype.begin = function (sprite) {
     sprite.element.style.setProperty(this.propName, this.value);

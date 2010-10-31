@@ -25,24 +25,38 @@ jam.MainMenuScene.prototype.load = function () {
     };
     this.addEntity(credits, null);
 
+    var logo = new hydra.Button(ui.querySelector(".logo"));
+    logo.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
+        hydra.task.ScaleTo.easeIn(1.1, 1, 2),
+        hydra.task.ScaleTo.easeOut(1, 1, 2)
+    ])));
+    this.addEntity(logo, null);
+
     var attract = new hydra.Group();
     for (var ii = 0; ii < 15; ++ii) {
-     var bug = hydra.Sprite.div("block0");
-     bug.setXY(hydra.math.randomInt(0, 320), hydra.math.randomInt(0, 400));
-     bug.setRotation(hydra.math.randomInt(0, 360));
-     bug.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
-         new hydra.task.Delay(hydra.math.random()*4+1.5),
-         new hydra.task.CallFunction(function (dt, bug) {
-             var x = hydra.math.randomInt(0, 320);
-             var y = hydra.math.randomInt(0, 400)
-             var dx = x - bug.getX();
-             var dy = y - bug.getY();
-             var r = hydra.math.toDegrees(Math.atan(dy/dx)) + (dx>0 ? 270 : 90);
-             bug.setRotation(r);
-             bug.addTask(hydra.task.MoveTo.easeOut(x, y, 1));
-         })
-     ])));
-     attract.addSprite(bug);
+        var bug = hydra.Sprite.div("block0");
+        bug.setXY(hydra.math.randomInt(0, 320), hydra.math.randomInt(0, 400));
+        bug.setRotation(hydra.math.randomInt(0, 360));
+        bug.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
+           new hydra.task.Delay(hydra.math.random()*4+1.5),
+           new hydra.task.CallFunction(function (dt, bug) {
+               var x = hydra.math.randomInt(0, 320);
+               var y = hydra.math.randomInt(0, 400)
+               var dx = x - bug.getX();
+               var dy = y - bug.getY();
+               var r = hydra.math.toDegrees(Math.atan(dy/dx)) + (dx>0 ? 270 : 90);
+               bug.setRotation(r);
+               bug.addTask(hydra.task.MoveTo.easeOut(x, y, 1));
+           })
+        ])));
+        (function (bug) { // Easter egg!
+            bug.registerListener(bug.element, "touchstart", function () {
+                bug.removeAllTasks();
+                bug.setRotation(0);
+                bug.element.className = "block" + hydra.math.randomInt(1, jam.Board.TILE_TYPES);
+            });
+        })(bug);
+        attract.addSprite(bug);
     }
 
     this.addEntity(attract, ui.querySelector(".ui-attract"));

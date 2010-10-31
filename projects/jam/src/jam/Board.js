@@ -61,7 +61,7 @@ jam.Board.prototype.startGame = function () {
 
     this.playing = true;
     this.score = 0;
-    this.gameOverTime = Date.now() + jam.Board.MAX_TIME;
+    this.elapsed = 0;
 
     this.dispatchEvent(jam.BoardEvent.GAME_STARTED);
     this.dispatchEvent(jam.BoardEvent.SCORE_CHANGED);
