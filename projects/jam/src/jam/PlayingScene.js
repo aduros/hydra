@@ -148,7 +148,7 @@ jam.PlayingScene.prototype.onScoreChanged = function () {
 }
 
 jam.PlayingScene.prototype.updateClock = function () {
-    var remaining = 2*60 - jam.ctx.board.elapsed;
+    var remaining = 90 - jam.ctx.board.elapsed;
     if (remaining >= 0) {
         var mins = hydra.math.toInt(remaining / 60);
         var secs = remaining % 60;
@@ -168,9 +168,11 @@ jam.PlayingScene.prototype.onGameOver = function () {
         jam.ctx.account["best"] = best;
         jam.ctx.saveAccount();
     }
-    alert("Game over! You scored " + jam.ctx.board.score + " points." +
+    hydra.director.replaceScene(
+        confirm("Game over! You scored " + jam.ctx.board.score + " points." +
         "\n" +
         "\n" +
-        "Your personal best is " + best + " points.");
-    hydra.director.unwindToScene(new jam.PlayingScene());
+        "Your personal best is " + best + " points. Play again?") ?
+        new jam.PlayingScene() : new jam.MainMenuScene());
+        //hydra.director.unwindToScene(new jam.PlayingScene()); // Doesn't work in my janky android emulator for some reason
 }
