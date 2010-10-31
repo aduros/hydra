@@ -19,6 +19,7 @@ goog.require("hydra.task.RotateTo");
 goog.require("hydra.Button");
 goog.require("hydra.storage");
 goog.require("hydra.simulator");
+goog.require("hydra.sound");
 
 if (!hydra.simulator.supportsTouch) {
     hydra.simulator.init();
@@ -32,9 +33,14 @@ if (!goog.DEBUG) {
 }
 
 goog.require("jam.PlayingScene");
+goog.require("jam.MainMenuScene");
 //goog.require("tetris.OrientationScene");
 
-hydra.director.init(new jam.PlayingScene());
+hydra.director.init(new jam.MainMenuScene());
+
+jam.ctx.music = hydra.sound.play("static/music.mp3");
+// Loop property doesn't work on iOS
+jam.ctx.music.addEventListener("ended", HTMLAudioElement.prototype.play, false);
 
 //// Fade in
 //var intro = new hydra.Scene("intro");

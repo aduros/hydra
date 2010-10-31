@@ -32,12 +32,15 @@ hydra.dom.addClass = function (element, className) {
 hydra.dom.removeClass = function (element, className) {
     // TODO: Use classList for supported browsers?
 
-//    var x = (" " + element.className + " ");
-//    element.className = x.replace(" " + className + " ", " ");//.trim();
+    //var x = (" " + element.className + " ");
+    //element.className = x.replace(" " + className + " ", " ");//.trim();
 
     var arr = element.className.split(" ");
-    arr.slice(arr.indexOf(className), 1);
-    element.className = arr.join(" ");
+    var idx = arr.indexOf(className);
+    if (idx >= 0) {
+        arr.splice(idx, 1);
+        element.className = arr.join(" ");
+    }
 }
 
 /**

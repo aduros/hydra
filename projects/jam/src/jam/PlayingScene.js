@@ -36,11 +36,23 @@ jam.PlayingScene.prototype.load = function () {
     this.score.setXY(32, 10);
     this.addEntity(this.score);
 
-    var clockIcon = new hydra.Sprite(hydra.dom.div("clock-icon"));
-    clockIcon.setXY(320-40, 10);
-    this.addEntity(clockIcon);
+    var muteButton = hydra.Button.div("mute-button");
+    muteButton.onTap = function () {
+        var oldValue = muteButton.isToggled();
+        if (oldValue) {
+            jam.ctx.music.play();
+        } else {
+            jam.ctx.music.pause();
+        }
+        //jam.ctx.account["mute"] = !oldValue;
+        //jam.ctx.saveAccount();
+        muteButton.setToggled(!oldValue);
+    }
+    //muteButton.setToggled(shouldMute);
+    muteButton.setXY(320-40-8, 10);
+    this.addEntity(muteButton);
 
-    var pauseButton = new hydra.Button(hydra.dom.div("pause-button"));
+    var pauseButton = hydra.Button.div("pause-button");
     pauseButton.setXY(0, 10);
     pauseButton.onTap = function () {
         var pauseScene = new hydra.Scene("pause");
@@ -95,7 +107,11 @@ jam.PlayingScene.prototype.load = function () {
         })
     ]));
     interstitial.addEntity(ready);
-    hydra.director.pushScene(interstitial);
+
+    // Play the interstitial after the first tick
+    this.addTask(new hydra.task.CallFunction(function () {
+        hydra.director.pushScene(interstitial);
+    }));
 }
 
 jam.PlayingScene.prototype.onScoreChanged = function () {

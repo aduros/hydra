@@ -5,9 +5,10 @@ goog.provide("hydra.Music");
 // TODO: Audio element pooling
 /**
  * @param {string} src
+ * @return {HTMLAudioElement}
  */
 hydra.sound.play = function (src) {
-    var audio = document.createElement("audio");
+    var audio = /** @type {HTMLAudioElement} */ (document.createElement("audio"));
     audio.src = src;
     audio.load(); // iPhone doesn't autoplay
     audio.play();
@@ -95,9 +96,6 @@ hydra.Music.prototype.enter = function () {
     }
 }
 
-/**
- * @override
- */
 hydra.Music.prototype.setEnabled = function (enabled) {
     if (enabled && !this.enabled) {
         this.audio.play();

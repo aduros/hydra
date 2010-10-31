@@ -74,8 +74,8 @@ jam.Board.prototype.startGame = function () {
 }
 
 jam.Board.prototype.randomBlock = function () {
-    var level = hydra.math.toInt(this.score/100);
-    if (hydra.math.random() < hydra.math.min(0.2, 0.1*(level+1))) {
+    var level = hydra.math.toInt(this.score/5000);
+    if (hydra.math.random() < 0.1*(level+1)) {
         return 0;
     } else {
         return hydra.math.randomInt(1, hydra.math.min(jam.Board.TILE_TYPES,
@@ -123,10 +123,6 @@ jam.Board.prototype.addPoint = function (p) {
         }
         return result;
     }
-}
-
-jam.Board.prototype.canConnect = function (x1, y1, x2, y2) {
-    return true;
 }
 
 jam.Board.prototype.getBlockAt = function (x, y) {

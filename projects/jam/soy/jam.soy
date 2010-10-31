@@ -1,0 +1,47 @@
+{namespace jam.soy}
+
+/** */
+{template .scenePause}
+    <div class="label-pause">PAUSED</div>
+    <div class="punch-button punch-button-default">Continue</div>
+    <div class="punch-button">Main Menu</div>
+{/template}
+
+/**
+{template .sceneGameOver}
+    <div class="label-gameover">
+        <div>Score: <span class="stat">{$score}</span></div>
+        {if $isHighScore}
+            <div class="label-highscore">It's a new high score!</div>
+        {/if}
+    </div>
+    <div class="punch-button punch-button-default">Replay</div>
+    <div class="punch-button">Main Menu</div>
+{/template}
+*/
+
+/**
+ * @param scores
+ */
+{template .scoreMenu}
+    <div class="scoremenu">
+        {foreach $s in $scores}
+            <div class="{if isFirst($s)}label-highscore{/if}">
+                {$s.score} pts, {$s.date}
+            </div>
+        {ifempty} <div>No scores recorded yet!</div>
+        {/foreach}
+        <div class="button-back punch-button">Back</div>
+    </div>
+{/template}
+
+/**
+ */
+{template .sceneMainMenu}
+    <div class="credits">by b_garcia <img src="static/twitter.png"></div>
+    <div class="ui-attract"></div>
+    <div class="logo"></div>
+    <div class="menu">
+        <div class="button-play punch-button">PLAY</div>
+    </div>
+{/template}

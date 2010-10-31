@@ -174,8 +174,6 @@ jam.BoardSprite.prototype.onTouchMove = function (event) {
         case jam.AddPointResult.ADDED:
             var block = this.blockSprites[y*jam.Board.WIDTH+x];
             block.element.style.backgroundColor = "#fff";
-//            block.setScale(1.2);
-//            console.log("New point");
             // No break
         case jam.AddPointResult.ALREADY_ADDED:
             if (this.lastTouch) {
@@ -205,8 +203,12 @@ jam.BoardSprite.prototype.onScoreChanged = function (delta) {
         var floater = hydra.Sprite.div("floater");
         floater.element.innerText = "+" + delta;
         floater.addTask(new hydra.task.Sequence([
-            hydra.task.MoveBy.linear(0, -20, 1),
+            hydra.task.MoveBy.linear(0, -30, 1.5),
             new hydra.task.SelfDestruct()
+        ]));
+        floater.addTask(new hydra.task.Sequence([
+            new hydra.task.Delay(1),
+            hydra.task.AnimateCss.linear("opacity", "0", 0.5)
         ]));
         this.addSprite(floater);
         // clientWidth/height only available when added to the document

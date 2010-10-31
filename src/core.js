@@ -155,6 +155,10 @@ hydra.director.getCurrentScene = function () {
     return hydra.currentScene;
 }
 
+hydra.director.getPreviousScene = function () {
+    return hydra.scenes[hydra.scenes.length-2];
+}
+
 hydra.director.getStage = function () {
     return hydra.stage;
 }

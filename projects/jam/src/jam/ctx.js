@@ -7,8 +7,8 @@ goog.require("jam.Board");
 /** @type {jam.Board} */
 jam.ctx.board;
 
-///** @type {hydra.Music} */
-//jam.ctx.music;
+/** @type {HTMLAudioElement} */
+jam.ctx.music;
 
 jam.ctx.account = hydra.storage.get("jam") || {};
 
