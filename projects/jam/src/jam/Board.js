@@ -41,13 +41,7 @@ jam.Board.HEIGHT = 9;
  * @const
  * @type {number}
  */
-jam.Board.TILE_TYPES = 6;
-
-/**
- * @const
- * @type {number}
- */
-jam.Board.STARTING_TILES = 3;
+jam.Board.TILE_TYPES = 3;
 
 /**
  * @const
@@ -62,24 +56,23 @@ jam.Board.prototype.startGame = function () {
 
     this.blocks = [];
     for (var ii = 0; ii < jam.Board.WIDTH*jam.Board.HEIGHT; ++ii) {
-        this.blocks[ii] = hydra.math.randomInt(1, jam.Board.STARTING_TILES+1);
+        this.blocks[ii] = hydra.math.randomInt(1, jam.Board.TILE_TYPES+1);
     }
 
     this.playing = true;
     this.score = 0;
-    this.gameOverTime = Date.now() + 0.5*jam.Board.MAX_TIME;
+    this.gameOverTime = Date.now() + jam.Board.MAX_TIME;
 
     this.dispatchEvent(jam.BoardEvent.GAME_STARTED);
     this.dispatchEvent(jam.BoardEvent.SCORE_CHANGED);
 }
 
 jam.Board.prototype.randomBlock = function () {
-    var level = hydra.math.toInt(this.score/5000);
-    if (hydra.math.random() < 0.1*(level+1)) {
+    var level = hydra.math.toInt(this.score/10000);
+    if (hydra.math.random() < hydra.math.min(0.3, 0.1*(level+1))) {
         return 0;
     } else {
-        return hydra.math.randomInt(1, hydra.math.min(jam.Board.TILE_TYPES,
-            jam.Board.STARTING_TILES + level));
+        return hydra.math.randomInt(1, jam.Board.TILE_TYPES);
     }
 }
 
