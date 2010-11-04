@@ -1,7 +1,7 @@
 goog.provide("tetris.BoardSprite");
 
 goog.require("hydra.Group");
-goog.require("hydra.task.AnimateCss");
+goog.require("hydra.task.StyleTo");
 goog.require("hydra.task.SelfDestruct");
 goog.require("hydra.task.Sequence");
 goog.require("hydra.task.Parallel");
@@ -47,10 +47,10 @@ tetris.BoardSprite.prototype.onPieceDropped = function (p) {
     this.activePiece.element.style.opacity = "0.2";
 
     // TODO: hydra.task.Parallel
-//    this.activePiece.addTask(hydra.task.AnimateCss.linear("opacity", "0.1", 0.6));
+//    this.activePiece.addTask(hydra.task.StyleTo.linear("opacity", "0.1", 0.6));
     this.activePiece.addTask(hydra.task.MoveBy.linear(0, 500, 0.5));
     this.activePiece.addTask(new hydra.task.Sequence([
-        hydra.task.AnimateCss.linear("opacity", "0", 0.5),
+        hydra.task.StyleTo.linear("opacity", "0", 0.5),
         new hydra.task.SelfDestruct()
     ]));
     this.activePiece = null;
@@ -182,7 +182,7 @@ tetris.BoardSprite.prototype.onRowsCleared = function (rows) {
 //    ]));
 
     this.addTask(new hydra.task.Sequence([
-        hydra.task.AnimateCss.linear("opacity", "0.8", 0.5, explosions),
+        hydra.task.StyleTo.linear("opacity", "0.8", 0.5, explosions),
         new hydra.task.CallFunction(function () {
             for (var ii = 0, ll = toRemove.length; ii < ll; ++ii) {
                 toRemove[ii].destroy();

@@ -1,6 +1,6 @@
 import "../../hydra.rake"
 
 ENTRY_POINT = "jam.main"
-DEBUG = false
+DEBUG = true
 
 task :default => :deploy

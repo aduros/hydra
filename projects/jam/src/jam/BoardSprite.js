@@ -1,7 +1,7 @@
 goog.provide("jam.BoardSprite");
 
 goog.require("hydra.Group");
-goog.require("hydra.task.AnimateCss");
+goog.require("hydra.task.StyleTo");
 goog.require("hydra.task.SelfDestruct");
 goog.require("hydra.task.Sequence");
 goog.require("hydra.task.Parallel");
@@ -208,7 +208,7 @@ jam.BoardSprite.prototype.onScoreChanged = function (delta) {
         ]));
         floater.addTask(new hydra.task.Sequence([
             new hydra.task.Delay(1),
-            hydra.task.AnimateCss.linear("opacity", "0", 0.5)
+            hydra.task.StyleTo.linear("opacity", "0", 0.5)
         ]));
         this.addSprite(floater);
         // clientWidth/height only available when added to the document

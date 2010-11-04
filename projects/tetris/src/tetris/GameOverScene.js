@@ -46,7 +46,7 @@ tetris.GameOverScene.prototype.load = function () {
     this.root.setXY(320, 100);
     this.root.setCss("opacity", "0");
     this.addTask(hydra.task.MoveTo.linear(0, 100, 0.2));
-    this.addTask(hydra.task.AnimateCss.linear("opacity", "1", 0.2));
+    this.addTask(hydra.task.StyleTo.linear("opacity", "1", 0.2));
 
     var replay = new hydra.Button(ui.querySelector(".button-replay"));
     replay.onTap = function () {

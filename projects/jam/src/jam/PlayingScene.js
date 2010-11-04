@@ -65,11 +65,11 @@ jam.PlayingScene.prototype.load = function () {
         fader.registerListener(document, "touchstart", function () {
             fader.removeAllTasks();
             fader.addTask(new hydra.task.Sequence([
-                hydra.task.AnimateCss.linear("opacity", "0", 0.5),
+                hydra.task.StyleTo.linear("opacity", "0", 0.5),
                 new hydra.task.CallFunction(hydra.director.popScene)
             ]));
         });
-        fader.addTask(hydra.task.AnimateCss.linear("opacity", "0.9", 0.5));
+        fader.addTask(hydra.task.StyleTo.linear("opacity", "0.9", 0.5));
         pauseScene.addEntity(fader);
 
         var label = new hydra.Sprite(hydra.dom.div("paused"));
@@ -103,9 +103,9 @@ jam.PlayingScene.prototype.load = function () {
         new hydra.task.Parallel([
             hydra.task.MoveTo.linear(60, 416/2, 3),
             new hydra.task.Sequence([
-                hydra.task.AnimateCss.easeIn("opacity", "1", 1),
+                hydra.task.StyleTo.easeIn("opacity", "1", 1),
                 new hydra.task.Delay(1.5),
-                hydra.task.AnimateCss.easeOut("opacity", "0", 0.5)
+                hydra.task.StyleTo.easeOut("opacity", "0", 0.5)
             ])
         ]),
         new hydra.task.CallFunction(function () {
@@ -118,7 +118,7 @@ jam.PlayingScene.prototype.load = function () {
                     hydra.task.ScaleTo.easeOut(1, 1, 1),
                     new hydra.task.Sequence([
                         new hydra.task.Delay(0.5),
-                        hydra.task.AnimateCss.linear("opacity", "0", 0.5)
+                        hydra.task.StyleTo.linear("opacity", "0", 0.5)
                     ])
                 ]),
                 new hydra.task.SelfDestruct()

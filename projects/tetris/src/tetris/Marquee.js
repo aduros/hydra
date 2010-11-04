@@ -23,9 +23,9 @@ tetris.Marquee.prototype.setText = function (text) {
     setTimeout(function () { 
         var w = self.label.element.offsetWidth;
         self.addTask(new hydra.task.Sequence([
-            hydra.task.AnimateCss.linear("opacity", "1", 0.5),
+            hydra.task.StyleTo.linear("opacity", "1", 0.5),
             hydra.task.MoveTo.linear(-w, 0, (w+200)/100, self.label),
-            hydra.task.AnimateCss.linear("opacity", "0", 0.5)
+            hydra.task.StyleTo.linear("opacity", "0", 0.5)
         ]));
     }, 0);
 }

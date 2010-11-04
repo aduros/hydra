@@ -78,7 +78,7 @@ tetris.MainMenuScene.prototype.createMainSprite = function (animate) {
         transition.addTask(new hydra.task.Sequence([
             new hydra.task.Parallel([
                 hydra.task.MoveTo.linear(0, -416, tetris.MainMenuScene.TRANSITION_TIME, current.getRoot()),
-                hydra.task.AnimateCss.linear("opacity", "0.2", tetris.MainMenuScene.TRANSITION_TIME/2, current.getRoot()),
+                hydra.task.StyleTo.linear("opacity", "0.2", tetris.MainMenuScene.TRANSITION_TIME/2, current.getRoot()),
                 hydra.task.MoveTo.linear(0, 0, tetris.MainMenuScene.TRANSITION_TIME, next.getRoot())
             ]),
             new hydra.task.CallFunction(function () {
@@ -150,7 +150,7 @@ tetris.MainMenuScene.createTransition = function () {
     transition.addTask(new hydra.task.Sequence([
         new hydra.task.Parallel([
             hydra.task.MoveTo.linear(0, 416, tetris.MainMenuScene.TRANSITION_TIME, current.getRoot()),
-            hydra.task.AnimateCss.linear("opacity", "0.2", tetris.MainMenuScene.TRANSITION_TIME/2, current.getRoot()),
+            hydra.task.StyleTo.linear("opacity", "0.2", tetris.MainMenuScene.TRANSITION_TIME/2, current.getRoot()),
             hydra.task.MoveTo.linear(0, 0, tetris.MainMenuScene.TRANSITION_TIME, next.getRoot())
         ]),
         new hydra.task.CallFunction(function () {

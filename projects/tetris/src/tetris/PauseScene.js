@@ -21,7 +21,7 @@ tetris.PauseScene.prototype.load = function () {
     this.root.setXY(-320, 100);
     this.root.setCss("opacity", "0");
     this.addTask(hydra.task.MoveTo.linear(0, 100, 0.2));
-    this.addTask(hydra.task.AnimateCss.linear("opacity", "1", 0.2));
+    this.addTask(hydra.task.StyleTo.linear("opacity", "1", 0.2));
 
     // Fade in
 //    this.root.element.style.opacity = "0";
@@ -37,7 +37,7 @@ tetris.PauseScene.prototype.load = function () {
     var resume = new hydra.Button(ui.querySelector(".button-resume"));
     resume.onTap = function () {
         self.addTask(new hydra.task.Sequence([
-            hydra.task.AnimateCss.linear("opacity", "0", 0.2),
+            hydra.task.StyleTo.linear("opacity", "0", 0.2),
             new hydra.task.CallFunction(hydra.director.popScene)
         ]));
     };
@@ -54,7 +54,7 @@ tetris.PauseScene.prototype.load = function () {
 //    this.registerListener(document, "touchstart", function () {
 //        self.removeAllTasks();
 //        self.addTask(new hydra.task.Sequence([
-//            hydra.task.AnimateCss.linear("opacity", "0", 0.2),
+//            hydra.task.StyleTo.linear("opacity", "0", 0.2),
 //            new hydra.task.CallFunction(hydra.director.popScene)
 //        ]));
 //    });

@@ -95,6 +95,8 @@ hydra.math.clamp = function (n, min, max) {
     return n > max ? max : (n < min ? min : n);
 }
 
+// TODO: hydra.Interpolator typedef
+
 hydra.interpolators.LINEAR = function (t, a, b, d) {
     return a + (b-a) * (t/d);
 }
@@ -102,9 +104,8 @@ hydra.interpolators.LINEAR = function (t, a, b, d) {
 // TODO
 hydra.interpolators.EASE_IN = hydra.interpolators.LINEAR;
 
-hydra.interpolators.INSTANT = function (t, a, b, d) {
-    return b;
-}
+// TODO
+hydra.interpolators.EASE_OUT = hydra.interpolators.LINEAR;
 
 /**
  * @constructor

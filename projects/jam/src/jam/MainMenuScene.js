@@ -137,7 +137,7 @@ jam.MainMenuScene.prototype.load = function () {
 //    transition.addTask(new hydra.task.Sequence([
 //        new hydra.task.Parallel([
 //            hydra.task.MoveTo.linear(0, 416, jam.MainMenuScene.TRANSITION_TIME, current.getRoot()),
-//            hydra.task.AnimateCss.linear("opacity", "0.2", jam.MainMenuScene.TRANSITION_TIME/2, current.getRoot()),
+//            hydra.task.StyleTo.linear("opacity", "0.2", jam.MainMenuScene.TRANSITION_TIME/2, current.getRoot()),
 //            hydra.task.MoveTo.linear(0, 0, jam.MainMenuScene.TRANSITION_TIME, next.getRoot())
 //        ]),
 //        new hydra.task.CallFunction(function () {

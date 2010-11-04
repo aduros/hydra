@@ -6,7 +6,7 @@ goog.require("hydra.dom");
 goog.require("hydra.math");
 goog.require("hydra.Scene");
 goog.require("hydra.Sprite");
-goog.require("hydra.task.AnimateCss");
+goog.require("hydra.task.StyleTo");
 goog.require("hydra.task.CallFunction");
 goog.require("hydra.task.Delay");
 goog.require("hydra.task.MoveTo");
@@ -49,7 +49,7 @@ jam.ctx.music.addEventListener("ended", HTMLAudioElement.prototype.play, false);
 var intro = new hydra.Scene("intro");
 var darkness = new hydra.Sprite(hydra.dom.div("darkness"));
 darkness.addTask(new hydra.task.Sequence([
-   hydra.task.AnimateCss.easeIn("opacity", "0", 1),
+   hydra.task.StyleTo.easeIn("opacity", "0", 1),
    new hydra.task.CallFunction(hydra.director.popScene)
 ]));
 intro.addEntity(darkness);

@@ -1,6 +1,6 @@
 goog.provide("hydra.Sprite");
 goog.provide("hydra.Group");
-goog.provide("hydra.task.AnimateCss");
+goog.provide("hydra.task.StyleTo");
 goog.provide("hydra.task.MoveTo");
 goog.provide("hydra.task.MoveBy");
 goog.provide("hydra.task.ScaleTo");
@@ -13,6 +13,11 @@ goog.require("hydra.interpolators");
 goog.require("hydra.array");
 //goog.require("hydra.Entity");
 goog.require("hydra.dom");
+
+/**
+ * @define {boolean} Use the CSS Transitions API for animations.
+ */
+hydra.USE_CSS_TRANSITIONS = true;
 
 /**
  * @constructor
@@ -140,6 +145,12 @@ hydra.Sprite.prototype.setScale = function (s) {
     this.updateTransform();
 }
 
+hydra.Sprite.prototype.setScaleXY = function (x, y) {
+    this.scaleX = x;
+    this.scaleY = y;
+    this.updateTransform();
+}
+
 hydra.Sprite.prototype.setRotation = function (rotation) {
     this.rotation = rotation;
     this.updateTransform();
@@ -255,18 +266,88 @@ hydra.Group.prototype.getChildCount = function () {
  * @private
  * @constructor
  * @implements {hydra.Task}
+ * @param {number} duration
+ * @param {hydra.Sprite=} spriteOverride
+ * @param {function(number, number, number, number) :number} interpolator
+ */
+hydra.task.BasicAnimation = function (duration, interpolator, spriteOverride) {
+    this.duration = 1000*duration;
+    this.interpolator = interpolator;
+    this.spriteOverride = spriteOverride;
+    this.elapsed = 0;
+}
+
+/**
+ * @param {hydra.Sprite} sprite
+ * @protected
+ */
+hydra.task.BasicAnimation.prototype.progress = function (sprite) { }
+
+/**
+ * @param {hydra.Sprite} sprite
+ * @protected
+ */
+hydra.task.BasicAnimation.prototype.begin = function (sprite) { }
+
+hydra.task.BasicAnimation.prototype.interpolate = function (from, to) {
+    return this.interpolator(this.elapsed, from, to, this.duration);
+}
+
+/**
+ * @param {hydra.Sprite} sprite
+ */
+hydra.task.BasicAnimation.prototype.update = function (dt, sprite) {
+    sprite = this.spriteOverride || sprite;
+    if (!this.elapsed) {
+        this.begin(sprite);
+    }
+    this.elapsed += dt;
+    if (this.elapsed > this.duration) {
+        this.elapsed = this.duration;
+    }
+    this.progress(sprite);
+    if (this.elapsed >= this.duration) {
+        this.elapsed = 0;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @param {!hydra.Sprite} sprite
+ */
+hydra.task.BasicAnimation.prototype.stop = function (sprite) { }
+
+/**
+ * @param {!hydra.Sprite} sprite
+ */
+hydra.task.BasicAnimation.prototype.start = function (sprite) { }
+
+hydra.task.BasicAnimation.prototype.getDuration = function () {
+    return this.duration;
+}
+
+hydra.task.BasicAnimation.prototype.getElapsed = function () {
+    return this.elapsed;
+}
+
+/**
+ * @private
+ * @constructor
+ * @implements {hydra.Task}
  * @param {string} propName
  * @param {number} duration
  * @param {string} easing
  * @param {hydra.Sprite=} spriteOverride
  */
-hydra.task.NativeTransition = function (propName, duration, easing, spriteOverride) {
+hydra.task.TransitionAnimation = function (propName, duration, easing, spriteOverride) {
     this.propName = propName;
     this.duration = 1000*duration;
     this.easing = easing;
     this.spriteOverride = spriteOverride;
 
-    this.state = hydra.task.NativeTransition.State.RESET;
+    this.state = hydra.task.TransitionAnimation.State.RESET;
 
     /** @type function(number, number, number, number) :number */
     this.interpolator;
@@ -276,7 +357,7 @@ hydra.task.NativeTransition = function (propName, duration, easing, spriteOverri
  * @private
  * @enum {number}
  */
-hydra.task.NativeTransition.State = {
+hydra.task.TransitionAnimation.State = {
     RESET: 0,
     ANIMATING: 1,
     FINISHED: 2
@@ -286,21 +367,21 @@ hydra.task.NativeTransition.State = {
  * @param {hydra.Sprite} sprite
  * @protected
  */
-hydra.task.NativeTransition.prototype.begin = goog.abstractMethod;
+hydra.task.TransitionAnimation.prototype.begin = goog.abstractMethod;
 
 /**
  * @param {hydra.Sprite} sprite
  * @protected
  */
-hydra.task.NativeTransition.prototype.progress = function (sprite) { }
+hydra.task.TransitionAnimation.prototype.progress = function (sprite) { }
 
-hydra.task.NativeTransition.prototype.interpolate = function (from, to) {
+hydra.task.TransitionAnimation.prototype.interpolate = function (from, to) {
     return this.interpolator(this.elapsed, from, to, this.duration);
 }
 
-hydra.task.NativeTransition.prototype["handleEvent"] = function (event) {
+hydra.task.TransitionAnimation.prototype["handleEvent"] = function (event) {
     if (event["propertyName"] == this.propName) {
-        this.state = hydra.task.NativeTransition.State.FINISHED;
+        this.state = hydra.task.TransitionAnimation.State.FINISHED;
         event.target.removeEventListener("webkitTransitionEnd", this, false);
 //        console.log("Transition end event");
     }
@@ -309,10 +390,10 @@ hydra.task.NativeTransition.prototype["handleEvent"] = function (event) {
 /**
  * @param {hydra.Sprite} sprite
  */
-hydra.task.NativeTransition.prototype.update = function (dt, sprite) {
+hydra.task.TransitionAnimation.prototype.update = function (dt, sprite) {
     sprite = this.spriteOverride || sprite;
     switch (this.state) {
-        case hydra.task.NativeTransition.State.ANIMATING:
+        case hydra.task.TransitionAnimation.State.ANIMATING:
             this.elapsed += dt;
             if (this.elapsed > this.duration) {
                 this.elapsed = this.duration;
@@ -320,13 +401,13 @@ hydra.task.NativeTransition.prototype.update = function (dt, sprite) {
             this.progress(sprite);
             return false;
 
-        case hydra.task.NativeTransition.State.RESET:
+        case hydra.task.TransitionAnimation.State.RESET:
             var computedStyle = window.getComputedStyle(sprite.element, null);
             var oldValue = computedStyle.getPropertyValue(this.propName);
 
             this.begin(sprite);
             if (oldValue != sprite.element.style.getPropertyValue(this.propName)) {
-                this.state = hydra.task.NativeTransition.State.ANIMATING;
+                this.state = hydra.task.TransitionAnimation.State.ANIMATING;
 
                 hydra.dom.addTransition(sprite.element.style, this.propName, this.duration + "ms", this.easing);
 
@@ -345,8 +426,8 @@ hydra.task.NativeTransition.prototype.update = function (dt, sprite) {
                 return true;
             }
 
-        case hydra.task.NativeTransition.State.FINISHED:
-            this.state = hydra.task.NativeTransition.State.RESET;
+        case hydra.task.TransitionAnimation.State.FINISHED:
+            this.state = hydra.task.TransitionAnimation.State.RESET;
             hydra.dom.removeTransition(sprite.element.style, this.propName);
             return true;
     }
@@ -355,9 +436,9 @@ hydra.task.NativeTransition.prototype.update = function (dt, sprite) {
 /**
  * @param {!hydra.Sprite} sprite
  */
-hydra.task.NativeTransition.prototype.stop = function (sprite) {
+hydra.task.TransitionAnimation.prototype.stop = function (sprite) {
     // Interrupt if already stopped
-    if (this.state == hydra.task.NativeTransition.State.ANIMATING) {
+    if (this.state == hydra.task.TransitionAnimation.State.ANIMATING) {
         sprite = this.spriteOverride || sprite;
 
         var computedStyle = window.getComputedStyle(sprite.element, null);
@@ -376,9 +457,9 @@ hydra.task.NativeTransition.prototype.stop = function (sprite) {
 /**
  * @param {!hydra.Sprite} sprite
  */
-hydra.task.NativeTransition.prototype.start = function (sprite) {
+hydra.task.TransitionAnimation.prototype.start = function (sprite) {
     // Resume if previously interrupted
-    if (this.state == hydra.task.NativeTransition.State.ANIMATING) {
+    if (this.state == hydra.task.TransitionAnimation.State.ANIMATING) {
         sprite = this.spriteOverride || sprite;
 
         // Same issue?
@@ -394,388 +475,847 @@ hydra.task.NativeTransition.prototype.start = function (sprite) {
             element.addEventListener("webkitTransitionEnd", this, false);
 
         } else {
-            this.state = hydra.task.NativeTransition.State.FINISHED;
+            this.state = hydra.task.TransitionAnimation.State.FINISHED;
         }
     }
 }
 
-hydra.task.NativeTransition.prototype.getDuration = function () {
+hydra.task.TransitionAnimation.prototype.getDuration = function () {
     return this.duration;
 }
 
-hydra.task.NativeTransition.prototype.getElapsed = function () {
+hydra.task.TransitionAnimation.prototype.getElapsed = function () {
     return this.elapsed;
 }
 
-hydra.task.NativeTransition.prototype.isComplete = function () {
-    return this.state != hydra.task.NativeTransition.State.ANIMATING;
+hydra.task.TransitionAnimation.prototype.isComplete = function () {
+    return this.state != hydra.task.TransitionAnimation.State.ANIMATING;
 }
 
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {string} cssProperty
- * @param {string} value
- * @param {number} duration
- * @param {string} easing
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.AnimateCss = function (cssProperty, value, duration, easing, spriteOverride) {
-    goog.base(this, cssProperty, duration, easing, spriteOverride);
-    this.value = value;
-};
-goog.inherits(hydra.task.AnimateCss, hydra.task.NativeTransition);
+if (hydra.USE_CSS_TRANSITIONS) {
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {string} easing
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionStyleTo = function (cssProperty, value, duration, easing, spriteOverride) {
+        goog.base(this, cssProperty, duration, easing, spriteOverride);
+        this.value = value;
+    };
+    goog.inherits(hydra.task.TransitionStyleTo, hydra.task.TransitionAnimation);
 
-/**
- * @param {string} cssProperty
- * @param {string} value
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.AnimateCss.linear = function (cssProperty, value, duration, spriteOverride) {
-    return new hydra.task.AnimateCss(cssProperty, value, duration, "linear", spriteOverride);
-}
-
-/**
- * @param {string} cssProperty
- * @param {string} value
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.AnimateCss.easeIn = function (cssProperty, value, duration, spriteOverride) {
-    return new hydra.task.AnimateCss(cssProperty, value, duration, "ease-in", spriteOverride);
-}
-
-/**
- * @param {string} cssProperty
- * @param {string} value
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.AnimateCss.easeOut = function (cssProperty, value, duration, spriteOverride) {
-    return new hydra.task.AnimateCss(cssProperty, value, duration, "ease-out", spriteOverride);
-}
-
-/** @override */
-hydra.task.AnimateCss.prototype.begin = function (sprite) {
-    sprite.element.style.setProperty(this.propName, this.value);
-}
-
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.MoveTo = function (x, y, duration, easing, interpolator, spriteOverride) {
-    goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
-    this.x = x;
-    this.y = y;
-    this.interpolator = interpolator;
-}
-goog.inherits(hydra.task.MoveTo, hydra.task.NativeTransition);
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.MoveTo.linear = function (x, y, duration, spriteOverride) {
-    return new hydra.task.MoveTo(x, y, duration, "linear",
-        hydra.interpolators.LINEAR, spriteOverride);
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.MoveTo.easeIn = function (x, y, duration, spriteOverride) {
-    return new hydra.task.MoveTo(x, y, duration, "ease-in",
-        hydra.interpolators.INSTANT, spriteOverride); // FIXME: correct interpolator
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.MoveTo.easeOut = function (x, y, duration, spriteOverride) {
-    return new hydra.task.MoveTo(x, y, duration, "ease-out",
-        hydra.interpolators.INSTANT, spriteOverride); // FIXME: correct interpolator
-}
-
-/**
- * @override
- * @param {hydra.Sprite} sprite
- */
-hydra.task.MoveTo.prototype.begin = function (sprite) {
-    this.fromX = sprite.x;
-    this.fromY = sprite.y;
-
-    sprite.x = this.x;
-    sprite.y = this.y;
-    sprite.updateTransform();
-}
-
-/** @override */
-hydra.task.MoveTo.prototype.progress = function (sprite) {
-    sprite.x = this.interpolate(this.fromX, this.x);
-    sprite.y = this.interpolate(this.fromY, this.y);
-}
-
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.MoveBy = function (x, y, duration, easing, interpolator, spriteOverride) {
-    goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
-    this.dx = x;
-    this.dy = y;
-    this.interpolator = interpolator;
-};
-goog.inherits(hydra.task.MoveBy, hydra.task.NativeTransition);
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.MoveBy.linear = function (x, y, duration, spriteOverride) {
-//    return new hydra.task.MoveBy(x, y, duration, "cubic-bezier(0.2,0.8,0.0,1.0)",
-    return new hydra.task.MoveBy(x, y, duration, "linear",
-        hydra.interpolators.LINEAR, spriteOverride);
-}
-
-/**
- * @override
- * @param {hydra.Sprite} sprite
- */
-hydra.task.MoveBy.prototype.begin = function (sprite) {
-    this.fromX = sprite.x;
-    this.fromY = sprite.y;
-
-    if (this.toX == null) {
-        this.toX = this.dx + sprite.x;
-        this.toY = this.dy + sprite.y;
+    /**
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionStyleTo.linear = function (cssProperty, value, duration, spriteOverride) {
+        return new hydra.task.TransitionStyleTo(cssProperty, value, duration, "linear", spriteOverride);
     }
 
-    sprite.x = this.toX;
-    sprite.y = this.toY;
-    sprite.updateTransform();
+    /**
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionStyleTo.easeIn = function (cssProperty, value, duration, spriteOverride) {
+        return new hydra.task.TransitionStyleTo(cssProperty, value, duration, "ease-in", spriteOverride);
+    }
+
+    /**
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionStyleTo.easeOut = function (cssProperty, value, duration, spriteOverride) {
+        return new hydra.task.TransitionStyleTo(cssProperty, value, duration, "ease-out", spriteOverride);
+    }
+
+    /** @override */
+    hydra.task.TransitionStyleTo.prototype.begin = function (sprite) {
+        sprite.element.style.setProperty(this.propName, this.value);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionMoveTo = function (x, y, duration, easing, interpolator, spriteOverride) {
+        goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
+        this.x = x;
+        this.y = y;
+        this.interpolator = interpolator;
+    }
+    goog.inherits(hydra.task.TransitionMoveTo, hydra.task.TransitionAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionMoveTo.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionMoveTo(x, y, duration, "linear",
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionMoveTo.easeIn = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionMoveTo(x, y, duration, "ease-in",
+            hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionMoveTo.easeOut = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionMoveTo(x, y, duration, "ease-out",
+            hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.TransitionMoveTo.prototype.begin = function (sprite) {
+        this.fromX = sprite.x;
+        this.fromY = sprite.y;
+
+        sprite.x = this.x;
+        sprite.y = this.y;
+        sprite.updateTransform();
+    }
+
+    /** @override */
+    hydra.task.TransitionMoveTo.prototype.progress = function (sprite) {
+        sprite.x = this.interpolate(this.fromX, this.x);
+        sprite.y = this.interpolate(this.fromY, this.y);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionMoveBy = function (x, y, duration, easing, interpolator, spriteOverride) {
+        goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
+        this.dx = x;
+        this.dy = y;
+        this.interpolator = interpolator;
+    }
+    goog.inherits(hydra.task.TransitionMoveBy, hydra.task.TransitionAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionMoveBy.linear = function (x, y, duration, spriteOverride) {
+    //    return new hydra.task.TransitionMoveBy(x, y, duration, "cubic-bezier(0.2,0.8,0.0,1.0)",
+        return new hydra.task.TransitionMoveBy(x, y, duration, "linear",
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.TransitionMoveBy.prototype.begin = function (sprite) {
+        this.fromX = sprite.x;
+        this.fromY = sprite.y;
+
+        if (this.toX == null) {
+            this.toX = this.dx + sprite.x;
+            this.toY = this.dy + sprite.y;
+        }
+
+        sprite.x = this.toX;
+        sprite.y = this.toY;
+        sprite.updateTransform();
+    }
+
+    /** @override */
+    hydra.task.TransitionMoveBy.prototype.progress = function (sprite) {
+        sprite.x = this.interpolate(this.fromX, this.toX);
+        sprite.y = this.interpolate(this.fromY, this.toY);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionScaleTo = function (x, y, duration, easing, interpolator, spriteOverride) {
+        goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
+        this.x = x;
+        this.y = y;
+        this.interpolator = interpolator;
+    };
+    goog.inherits(hydra.task.TransitionScaleTo, hydra.task.TransitionAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionScaleTo.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionScaleTo(x, y, duration, "linear",
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionScaleTo.easeIn = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionScaleTo(x, y, duration, "ease-in",
+            hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionScaleTo.easeOut = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionScaleTo(x, y, duration, "ease-out",
+            hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.TransitionScaleTo.prototype.begin = function (sprite) {
+        this.fromX = sprite.scaleX;
+        this.fromY = sprite.scaleY;
+
+        sprite.scaleX = this.x;
+        sprite.scaleY = this.y;
+        sprite.updateTransform();
+    }
+
+    /** @override */
+    hydra.task.TransitionScaleTo.prototype.progress = function (sprite) {
+        sprite.scaleX = this.interpolate(this.fromX, this.x);
+        sprite.scaleY = this.interpolate(this.fromY, this.y);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionScaleBy = function (x, y, duration, easing, interpolator, spriteOverride) {
+        goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
+        this.dx = x;
+        this.dy = y;
+        this.interpolator = interpolator;
+    };
+    goog.inherits(hydra.task.TransitionScaleBy, hydra.task.TransitionAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionScaleBy.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.TransitionScaleBy(x, y, duration, "linear",
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.TransitionScaleBy.prototype.begin = function (sprite) {
+        this.fromX = sprite.scaleX;
+        this.fromY = sprite.scaleY;
+
+        sprite.scaleX *= this.dx;
+        sprite.scaleY *= this.dy;
+        sprite.updateTransform();
+
+        this.toX = sprite.scaleX;
+        this.toY = sprite.scaleY;
+    }
+
+    /** @override */
+    hydra.task.TransitionScaleBy.prototype.progress = function (sprite) {
+        sprite.scaleX = this.interpolate(this.fromX, this.toX);
+        sprite.scaleY = this.interpolate(this.fromY, this.toY);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateTo = function (rotation, duration, easing, interpolator, spriteOverride) {
+        goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
+        this.rotation = rotation;
+        this.interpolator = interpolator;
+    };
+    goog.inherits(hydra.task.TransitionRotateTo, hydra.task.TransitionAnimation);
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateTo.linear = function (rotation, duration, spriteOverride) {
+        return new hydra.task.TransitionRotateTo(rotation, duration, "linear",
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.TransitionRotateTo.prototype.begin = function (sprite) {
+        this.from = sprite.rotation;
+
+        sprite.rotation = this.rotation;
+        sprite.updateTransform();
+    }
+
+    /** @override */
+    hydra.task.TransitionRotateTo.prototype.progress = function (sprite) {
+        sprite.rotation = this.interpolate(this.from, this.rotation);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.TransitionAnimation
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateBy = function (rotation, duration, easing, interpolator, spriteOverride) {
+        goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
+        this.rotation = rotation;
+        this.interpolator = interpolator;
+    };
+    goog.inherits(hydra.task.TransitionRotateBy, hydra.task.TransitionAnimation);
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateBy.linear = function (rotation, duration, spriteOverride) {
+        return new hydra.task.TransitionRotateBy(rotation, duration, "linear",
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.TransitionRotateBy.prototype.begin = function (sprite) {
+        this.from = sprite.rotation;
+
+        sprite.rotation += this.rotation;
+        sprite.updateTransform();
+
+        this.to = sprite.rotation;
+    }
+
+    /** @override */
+    hydra.task.TransitionRotateBy.prototype.progress = function (sprite) {
+        sprite.rotation = this.interpolate(this.from, this.to);
+    }
+
+} else {
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicStyleTo = function (cssProperty, value, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.cssProperty = cssProperty;
+        this.value = value;
+    }
+    goog.inherits(hydra.task.BasicStyleTo, hydra.task.BasicAnimation);
+
+    /**
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicStyleTo.linear = function (cssProperty, value, duration, spriteOverride) {
+        return new hydra.task.BasicStyleTo(cssProperty, value, duration,
+            hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicStyleTo.easeIn = function (cssProperty, value, duration, spriteOverride) {
+        return new hydra.task.BasicStyleTo(cssProperty, value, duration,
+            hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {string} cssProperty
+     * @param {string} value
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicStyleTo.easeOut = function (cssProperty, value, duration, spriteOverride) {
+        return new hydra.task.BasicStyleTo(cssProperty, value, duration,
+            hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /** @override */
+    hydra.task.BasicStyleTo.prototype.progress = function (sprite) {
+        // TODO: Need a way to interpolate CSS strings intelligently
+        sprite.element.style.setProperty(this.cssProperty, this.value);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveTo = function (x, y, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.x = x;
+        this.y = y;
+    }
+    goog.inherits(hydra.task.BasicMoveTo, hydra.task.BasicAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveTo.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicMoveTo(x, y, duration, hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveTo.easeIn = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicMoveTo(x, y, duration, hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveTo.easeOut = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicMoveTo(x, y, duration, hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.BasicMoveTo.prototype.begin = function (sprite) {
+        console.log("BasicMoveTo.begin");
+        this.fromX = sprite.getX();
+        this.fromY = sprite.getY();
+    }
+
+    /** @override */
+    hydra.task.BasicMoveTo.prototype.progress = function (sprite) {
+        sprite.setXY(
+            this.interpolate(this.fromX, this.x),
+            this.interpolate(this.fromY, this.y));
+        console.log("progress", this.fromX, "->", sprite.x, this.fromY, "->", sprite.y);
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveBy = function (x, y, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.x = x;
+        this.y = y;
+    }
+    goog.inherits(hydra.task.BasicMoveBy, hydra.task.BasicAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveBy.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicMoveBy(x, y, duration, hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveBy.easeIn = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicMoveBy(x, y, duration, hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicMoveBy.easeOut = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicMoveBy(x, y, duration, hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.BasicMoveBy.prototype.begin = function (sprite) {
+        this.fromX = sprite.getX();
+        this.fromY = sprite.getY();
+    }
+
+    /** @override */
+    hydra.task.BasicMoveBy.prototype.progress = function (sprite) {
+        sprite.setXY(
+            this.interpolate(this.fromX, this.fromX+this.x),
+            this.interpolate(this.fromY, this.fromY+this.y));
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateTo = function (rotation, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.rotation = rotation;
+    }
+    goog.inherits(hydra.task.BasicRotateTo, hydra.task.BasicAnimation);
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateTo.linear = function (rotation, duration, spriteOverride) {
+        return new hydra.task.BasicRotateTo(rotation, duration, hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateTo.easeIn = function (rotation, duration, spriteOverride) {
+        return new hydra.task.BasicRotateTo(rotation, duration, hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateTo.easeOut = function (rotation, duration, spriteOverride) {
+        return new hydra.task.BasicRotateTo(rotation, duration, hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.BasicRotateTo.prototype.begin = function (sprite) {
+        console.log("BasicRotateTo.begin");
+        this.from = sprite.getRotation();
+    }
+
+    /** @override */
+    hydra.task.BasicRotateTo.prototype.progress = function (sprite) {
+        sprite.setRotation(this.interpolate(this.from, this.rotation));
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateBy = function (rotation, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.rotation = rotation;
+    }
+    goog.inherits(hydra.task.BasicRotateBy, hydra.task.BasicAnimation);
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateBy.linear = function (rotation, duration, spriteOverride) {
+        return new hydra.task.BasicRotateBy(rotation, duration, hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateBy.easeIn = function (rotation, duration, spriteOverride) {
+        return new hydra.task.BasicRotateBy(rotation, duration, hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicRotateBy.easeOut = function (rotation, duration, spriteOverride) {
+        return new hydra.task.BasicRotateBy(rotation, duration, hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.BasicRotateBy.prototype.begin = function (sprite) {
+        console.log("BasicRotateBy.begin");
+        this.from = sprite.getRotation();
+    }
+
+    /** @override */
+    hydra.task.BasicRotateBy.prototype.progress = function (sprite) {
+        sprite.setRotation(this.interpolate(this.from, this.from+this.rotation));
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleTo = function (x, y, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.x = x;
+        this.y = y;
+    }
+    goog.inherits(hydra.task.BasicScaleTo, hydra.task.BasicAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleTo.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicScaleTo(x, y, duration, hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleTo.easeIn = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicScaleTo(x, y, duration, hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleTo.easeOut = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicScaleTo(x, y, duration, hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.BasicScaleTo.prototype.begin = function (sprite) {
+        console.log("BasicScaleTo.begin");
+        this.fromX = sprite.getScaleX();
+        this.fromY = sprite.getScaleY();
+    }
+
+    /** @override */
+    hydra.task.BasicScaleTo.prototype.progress = function (sprite) {
+        sprite.setScaleXY(
+            this.interpolate(this.fromX, this.x),
+            this.interpolate(this.fromY, this.y));
+    }
+
+    /**
+     * @constructor
+     * @extends hydra.task.BasicAnimation
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleBy = function (x, y, duration, interpolator, spriteOverride) {
+        goog.base(this, duration, interpolator, spriteOverride);
+        this.x = x;
+        this.y = y;
+    }
+    goog.inherits(hydra.task.BasicScaleBy, hydra.task.BasicAnimation);
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleBy.linear = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicScaleBy(x, y, duration, hydra.interpolators.LINEAR, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleBy.easeIn = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicScaleBy(x, y, duration, hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.BasicScaleBy.easeOut = function (x, y, duration, spriteOverride) {
+        return new hydra.task.BasicScaleBy(x, y, duration, hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
+     * @override
+     * @param {hydra.Sprite} sprite
+     */
+    hydra.task.BasicScaleBy.prototype.begin = function (sprite) {
+        this.fromX = sprite.getScaleX();
+        this.fromY = sprite.getScaleY();
+    }
+
+    /** @override */
+    hydra.task.BasicScaleBy.prototype.progress = function (sprite) {
+        sprite.setScaleXY(
+            this.interpolate(this.fromX, this.fromX+this.x),
+            this.interpolate(this.fromY, this.fromY+this.y));
+    }
 }
 
-/** @override */
-hydra.task.MoveBy.prototype.progress = function (sprite) {
-    sprite.x = this.interpolate(this.fromX, this.toX);
-    sprite.y = this.interpolate(this.fromY, this.toY);
-}
-
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.ScaleTo = function (x, y, duration, easing, interpolator, spriteOverride) {
-    goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
-    this.x = x;
-    this.y = y;
-    this.interpolator = interpolator;
-};
-goog.inherits(hydra.task.ScaleTo, hydra.task.NativeTransition);
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.ScaleTo.linear = function (x, y, duration, spriteOverride) {
-    return new hydra.task.ScaleTo(x, y, duration, "linear",
-        hydra.interpolators.LINEAR, spriteOverride);
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.ScaleTo.easeIn = function (x, y, duration, spriteOverride) {
-    return new hydra.task.ScaleTo(x, y, duration, "ease-in",
-        hydra.interpolators.INSTANT, spriteOverride); // FIXME: Correct interpolator
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.ScaleTo.easeOut = function (x, y, duration, spriteOverride) {
-    return new hydra.task.ScaleTo(x, y, duration, "ease-out",
-        hydra.interpolators.INSTANT, spriteOverride); // FIXME: Correct interpolator
-}
-
-/**
- * @override
- * @param {hydra.Sprite} sprite
- */
-hydra.task.ScaleTo.prototype.begin = function (sprite) {
-    this.fromX = sprite.scaleX;
-    this.fromY = sprite.scaleY;
-
-    sprite.scaleX = this.x;
-    sprite.scaleY = this.y;
-    sprite.updateTransform();
-}
-
-/** @override */
-hydra.task.ScaleTo.prototype.progress = function (sprite) {
-    sprite.scaleX = this.interpolate(this.fromX, this.x);
-    sprite.scaleY = this.interpolate(this.fromY, this.y);
-}
-
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.ScaleBy = function (x, y, duration, easing, interpolator, spriteOverride) {
-    goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
-    this.dx = x;
-    this.dy = y;
-    this.interpolator = interpolator;
-};
-goog.inherits(hydra.task.ScaleBy, hydra.task.NativeTransition);
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.ScaleBy.linear = function (x, y, duration, spriteOverride) {
-    return new hydra.task.ScaleBy(x, y, duration, "linear",
-        hydra.interpolators.LINEAR, spriteOverride);
-}
-
-/**
- * @override
- * @param {hydra.Sprite} sprite
- */
-hydra.task.ScaleBy.prototype.begin = function (sprite) {
-    this.fromX = sprite.scaleX;
-    this.fromY = sprite.scaleY;
-
-    sprite.scaleX *= this.dx;
-    sprite.scaleY *= this.dy;
-    sprite.updateTransform();
-
-    this.toX = sprite.scaleX;
-    this.toY = sprite.scaleY;
-}
-
-/** @override */
-hydra.task.ScaleBy.prototype.progress = function (sprite) {
-    sprite.scaleX = this.interpolate(this.fromX, this.toX);
-    sprite.scaleY = this.interpolate(this.fromY, this.toY);
-}
-
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {number} rotation
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.RotateTo = function (rotation, duration, easing, interpolator, spriteOverride) {
-    goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
-    this.rotation = rotation;
-    this.interpolator = interpolator;
-};
-goog.inherits(hydra.task.RotateTo, hydra.task.NativeTransition);
-
-/**
- * @param {number} rotation
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.RotateTo.linear = function (rotation, duration, spriteOverride) {
-    return new hydra.task.RotateTo(rotation, duration, "linear",
-        hydra.interpolators.LINEAR, spriteOverride);
-}
-
-/**
- * @override
- * @param {hydra.Sprite} sprite
- */
-hydra.task.RotateTo.prototype.begin = function (sprite) {
-    this.from = sprite.rotation;
-
-    sprite.rotation = this.rotation;
-    sprite.updateTransform();
-}
-
-/** @override */
-hydra.task.RotateTo.prototype.progress = function (sprite) {
-    sprite.rotation = this.interpolate(this.from, this.rotation);
-}
-
-/**
- * @constructor
- * @extends hydra.task.NativeTransition
- * @param {number} rotation
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.RotateBy = function (rotation, duration, easing, interpolator, spriteOverride) {
-    goog.base(this, "-webkit-transform", duration, easing, spriteOverride);
-    this.rotation = rotation;
-    this.interpolator = interpolator;
-};
-goog.inherits(hydra.task.RotateBy, hydra.task.NativeTransition);
-
-/**
- * @param {number} rotation
- * @param {number} duration
- * @param {hydra.Sprite=} spriteOverride
- */
-hydra.task.RotateBy.linear = function (rotation, duration, spriteOverride) {
-    return new hydra.task.RotateBy(rotation, duration, "linear",
-        hydra.interpolators.LINEAR, spriteOverride);
-}
-
-/**
- * @override
- * @param {hydra.Sprite} sprite
- */
-hydra.task.RotateBy.prototype.begin = function (sprite) {
-    this.from = sprite.rotation;
-
-    sprite.rotation += this.rotation;
-    sprite.updateTransform();
-
-    this.to = sprite.rotation;
-}
-
-/** @override */
-hydra.task.RotateBy.prototype.progress = function (sprite) {
-    sprite.rotation = this.interpolate(this.from, this.to);
+if (hydra.USE_CSS_TRANSITIONS) {
+    hydra.task.StyleTo.linear = hydra.task.TransitionStyleTo.linear;
+    hydra.task.StyleTo.easeIn = hydra.task.TransitionStyleTo.easeIn;
+    hydra.task.StyleTo.easeOut = hydra.task.TransitionStyleTo.easeOut;
+    hydra.task.MoveTo.linear = hydra.task.TransitionMoveTo.linear;
+    hydra.task.MoveTo.easeIn = hydra.task.TransitionMoveTo.easeIn;
+    hydra.task.MoveTo.easeOut = hydra.task.TransitionMoveTo.easeOut;
+    hydra.task.MoveBy.linear = hydra.task.TransitionMoveBy.linear;
+    hydra.task.MoveBy.easeIn = hydra.task.TransitionMoveBy.easeIn;
+    hydra.task.MoveBy.easeOut = hydra.task.TransitionMoveBy.easeOut;
+    hydra.task.RotateTo.linear = hydra.task.TransitionRotateTo.linear;
+    hydra.task.RotateTo.easeIn = hydra.task.TransitionRotateTo.easeIn;
+    hydra.task.RotateTo.easeOut = hydra.task.TransitionRotateTo.easeOut;
+    hydra.task.RotateBy.linear = hydra.task.TransitionRotateBy.linear;
+    hydra.task.RotateBy.easeIn = hydra.task.TransitionRotateBy.easeIn;
+    hydra.task.RotateBy.easeOut = hydra.task.TransitionRotateBy.easeOut;
+    hydra.task.ScaleTo.linear = hydra.task.TransitionScaleTo.linear;
+    hydra.task.ScaleTo.easeIn = hydra.task.TransitionScaleTo.easeIn;
+    hydra.task.ScaleTo.easeOut = hydra.task.TransitionScaleTo.easeOut;
+    hydra.task.ScaleBy.linear = hydra.task.TransitionScaleBy.linear;
+    hydra.task.ScaleBy.easeIn = hydra.task.TransitionScaleBy.easeIn;
+    hydra.task.ScaleBy.easeOut = hydra.task.TransitionScaleBy.easeOut;
+} else {
+    hydra.task.StyleTo.linear = hydra.task.BasicStyleTo.linear;
+    hydra.task.StyleTo.easeIn = hydra.task.BasicStyleTo.easeIn;
+    hydra.task.StyleTo.easeOut = hydra.task.BasicStyleTo.easeOut;
+    hydra.task.MoveTo.linear = hydra.task.BasicMoveTo.linear;
+    hydra.task.MoveTo.easeIn = hydra.task.BasicMoveTo.easeIn;
+    hydra.task.MoveTo.easeOut = hydra.task.BasicMoveTo.easeOut;
+    hydra.task.MoveBy.linear = hydra.task.BasicMoveBy.linear;
+    hydra.task.MoveBy.easeIn = hydra.task.BasicMoveBy.easeIn;
+    hydra.task.MoveBy.easeOut = hydra.task.BasicMoveBy.easeOut;
+    hydra.task.RotateTo.linear = hydra.task.BasicRotateTo.linear;
+    hydra.task.RotateTo.easeIn = hydra.task.BasicRotateTo.easeIn;
+    hydra.task.RotateTo.easeOut = hydra.task.BasicRotateTo.easeOut;
+    hydra.task.RotateBy.linear = hydra.task.BasicRotateBy.linear;
+    hydra.task.RotateBy.easeIn = hydra.task.BasicRotateBy.easeIn;
+    hydra.task.RotateBy.easeOut = hydra.task.BasicRotateBy.easeOut;
+    hydra.task.ScaleTo.linear = hydra.task.BasicScaleTo.linear;
+    hydra.task.ScaleTo.easeIn = hydra.task.BasicScaleTo.easeIn;
+    hydra.task.ScaleTo.easeOut = hydra.task.BasicScaleTo.easeOut;
+    hydra.task.ScaleBy.linear = hydra.task.BasicScaleBy.linear;
+    hydra.task.ScaleBy.easeIn = hydra.task.BasicScaleBy.easeIn;
+    hydra.task.ScaleBy.easeOut = hydra.task.BasicScaleBy.easeOut;
 }
