@@ -5,9 +5,14 @@ LIBS = [
     HYDRA_HOME + "/lib",
     HYDRA_HOME + "/src",
     "./src",
+    "./build/soy"
 ];
 EXTERNS = [
     HYDRA_HOME + "/externs"
+];
+
+TARGET_NAMES = [
+    "unsupported", "webkit", "ff3", "ff4", "ie9", "opera"
 ];
 
 task :soy do
@@ -26,16 +31,15 @@ task :css do
     system("java -jar '" + HYDRA_HOME + "/tools/yuicompressor.jar' web/static/style.css -o build/deploy/static/style.css");
 end
 
-task :js do
+def run_compiler (defines, entry_point, output_file)
+# TODO: Merge in these options instead of replacing...
     options = {
         "warning_level" => "DEFAULT",
         "compilation_level" => "ADVANCED_OPTIMIZATIONS",
         "output_wrapper" => "/* Built with Hydra */(function(){%output%})()",
         "summary_detail_level" => "3",
     }
-    defines = {
-        "goog.DEBUG" => DEBUG ? "true" : "false",
-    }
+    defines["goog.DEBUG"] = DEBUG ? "true" : "false";
     errors = [ "accessControls", "checkRegExp", "checkTypes", "checkVars", "externsValidation",
         "ambiguousFunctionDecl", "invalidCasts", "missingProperties", "strictModuleDepCheck",
         "undefinedVars", "visibility" ]
@@ -45,9 +49,8 @@ task :js do
         options["formatting"] = "PRETTY_PRINT";
     end
 
-    LIBS.push("build/soy");
     system(
-        "'" + HYDRA_HOME + "/closure/closure/bin/build/closurebuilder.py' --namespace '" + ENTRY_POINT + "'" +
+        "'" + HYDRA_HOME + "/closure/closure/bin/build/closurebuilder.py' --namespace '" + entry_point + "'" +
         " " + LIBS.map {|path| "'--root=" + path + "'" }.join(" ") + 
         " -o compiled -c '" + HYDRA_HOME + "/tools/compiler.jar'" +
         " " + options.map {|key, value| "-f '--" + key + "=" + value + "'" }.join(" ") +
@@ -55,8 +58,30 @@ task :js do
         " " + errors.map {|error| "-f --jscomp_error=" + error}.join(" ") +
         " " + warnings.map {|warning| "-f --jscomp_warning=" + warning}.join(" ") +
         " " + EXTERNS.map {|dir| FileList.new(dir+"/**/*.js").map {|file| "-f --externs=" + file}.join(" ")}.join(" ") +
-        " --output_file=build/deploy/static/app.js"
+        " '--output_file=" + output_file + "'"
         );
+end
+
+def compile_app (target)
+    puts("Compiling JS for '" + target + "'...");
+    defines = {
+        "hydra.platform.COMPILED_TARGET" => String(TARGET_NAMES.index(target)),
+    }
+    run_compiler(defines, ENTRY_POINT, "build/deploy/static/app-" + target + ".js");
+end
+
+task :js do
+    compile_app(DEFAULT_TARGET);
+end
+
+task :js_all do
+    for ii in 0..TARGET_NAMES.length-1 do
+        compile_app(TARGET_NAMES[ii]);
+    end
+end
+
+task :launcher do
+    run_compiler({}, "hydra.launcher", "build/deploy/static/launcher.js");
 end
 
 task :clean do
@@ -68,4 +93,4 @@ task :prepare => :clean do
     cp_r("web", "build/deploy");
 end
 
-task :deploy => [:prepare, :css, :soy, :js]
+task :deploy => [:prepare, :css, :launcher, :soy, :js_all]

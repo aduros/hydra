@@ -77,14 +77,14 @@ hydra.ListenerManager.prototype.unregisterListener = function (dispatcher, event
             break;
         }
     }
-    dispatcher.removeEventListener(eventName, handler);
+    dispatcher.removeEventListener(eventName, handler, false);
 }
 
 hydra.ListenerManager.prototype.unregisterAllListeners = function () {
     //for (var ii = 0, ll = this.listeners.length; ii < ll; ++ii) {
     for (var ii = 0; ii < this.listeners.length; ++ii) {
         var listener = this.listeners[ii];
-        listener.dispatcher.removeEventListener(listener.eventName, listener.handler);
+        listener.dispatcher.removeEventListener(listener.eventName, listener.handler, false);
     }
     this.listeners = [];
 }

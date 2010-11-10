@@ -1,5 +1,7 @@
 goog.provide("hydra.dom");
 
+goog.require("hydra.platform");
+
 /**
  * @param {Element} element
  * @param {string} className
@@ -60,32 +62,32 @@ hydra.dom.replaceClass = function (element, from, to) {
  * @param {string} timingFunction
  */
 hydra.dom.addTransition = function (style, property, duration, timingFunction) {
-    var transitionProperty = style.WebkitTransitionProperty;
+    var transitionProperty = style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"];
     if (transitionProperty) {
         var allProperties = transitionProperty.split(", ");
         var idx = allProperties.indexOf(property);
         if (idx < 0) {
             // Append a new transition
-            style.WebkitTransitionProperty += ", " + property;
-            style.WebkitTransitionDuration += ", " + duration;
-            style.WebkitTransitionTimingFunction += ", " + timingFunction;
+            style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] += ", " + property;
+            style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] += ", " + duration;
+            style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] += ", " + timingFunction;
 
         } else {
             // Update the existing transition settings to the new values
-            var allDurations = style.WebkitTransitionDuration.split(", ");
+            var allDurations = style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"].split(", ");
             allDurations[idx] = duration;
-            style.WebkitTransitionDuration = allDurations.join(", ");
+            style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = allDurations.join(", ");
 
-            var allTimingFunctions = style.WebkitTransitionTimingFunction.split(", ");
+            var allTimingFunctions = style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"].split(", ");
             allTimingFunctions[idx] = duration;
-            style.WebkitTransitionTimingFunction = allTimingFunctions.join(", ");
+            style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = allTimingFunctions.join(", ");
         }
 
     } else {
         // transition-property is empty, just set them
-        style.WebkitTransitionProperty = property;
-        style.WebkitTransitionDuration = duration;
-        style.WebkitTransitionTimingFunction = timingFunction;
+        style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] = property;
+        style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = duration;
+        style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = timingFunction;
     }
 }
 
@@ -94,28 +96,28 @@ hydra.dom.addTransition = function (style, property, duration, timingFunction) {
  * @param {string} property
  */
 hydra.dom.removeTransition = function (style, property) {
-    var transitionProperty = style.WebkitTransitionProperty;
+    var transitionProperty = style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"];
     if (transitionProperty) {
         var allProperties = transitionProperty.split(", ");
         var idx = allProperties.indexOf(property);
         if (idx >= 0) {
             if (allProperties.length > 1) {
                 allProperties.splice(idx, 1);
-                style.WebkitTransitionProperty = allProperties.join(", ");
+                style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] = allProperties.join(", ");
 
-                var allDurations = style.WebkitTransitionDuration.split(", ");
+                var allDurations = style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"].split(", ");
                 allDurations.splice(idx, 1);
-                style.WebkitTransitionDuration = allDurations.join(", ");
+                style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = allDurations.join(", ");
 
-                var allTimingFunctions = style.WebkitTransitionTimingFunction.split(", ");
+                var allTimingFunctions = style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"].split(", ");
                 allTimingFunctions.splice(idx, 1);
-                style.WebkitTransitionTimingFunction = allTimingFunctions.join(", ");
+                style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = allTimingFunctions.join(", ");
 
             } else {
                 // Shortcut: If this property was the only transition, simply clear everything
-                style.WebkitTransitionProperty = "";
-                style.WebkitTransitionDuration = "";
-                style.WebkitTransitionTimingFunction = "";
+                style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] = "";
+                style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = "";
+                style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = "";
             }
         }
     }

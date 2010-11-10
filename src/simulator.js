@@ -59,9 +59,11 @@ hydra.simulator.handleMouse = function (e) {
 //    touchEvent["initTouchEvent"](touchType, e.bubbles, e.cancelable, e.view, e.detail, e.screenX,
 //        e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey);
 
-    // Chrome doesn't set the touch type in initEvent.
+    // Chrome doesn't set the touch type in initEvent?
     // FIXME: FF does, but complains if you set it afterward
-    touchEvent.type = touchType;
+    if (hydra.platform.IS_WEBKIT) {
+        touchEvent.type = touchType;
+    }
     touchEvent.touches = (touchType == "touchend") ? [] : [touch];
     touchEvent.targetTouches = (touchType == "touchend") ? [] : [touch];
     touchEvent.changedTouches = [touch];
