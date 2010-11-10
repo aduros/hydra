@@ -942,7 +942,6 @@ hydra.task.BasicStyleTo.prototype.begin = function (sprite) {
 
 /** @override */
 hydra.task.BasicStyleTo.prototype.progress = function (sprite) {
-    console.log(this.interpolate(this.fromValue, this.value));
     sprite.element.style.setProperty(this.cssProperty,
         this.interpolate(this.fromValue, this.value), "");
 }
