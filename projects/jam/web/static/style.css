@@ -19,8 +19,14 @@ html, body {
     color: white;
     margin: 0;
     -webkit-box-align: center;
-    -webkit-box-pack: center;
+    -moz-box-align: center;
+    -webkit-box-align: center;
+    -moz-box-pack: center;
+    box-align: center;
+    box-pack: center;
     display: -webkit-box;
+    display: -moz-box;
+    display: box;
 }
 
 #hydra-stage {
@@ -59,11 +65,16 @@ html, body {
     border: 2px solid black;
     padding-left: 4px;
     -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
 }
 
 .ready, .go {
     font-weight: bold;
     -webkit-text-stroke: 1px black;
+    -moz-text-stroke: 1px black;
+    -ms-text-stroke: 1px black;
+    -o-text-stroke: 1px black;
+    text-stroke: 1px black;
 }
 .ready {
     font-size: 36pt;
@@ -131,12 +142,15 @@ html, body {
     font-size: 24pt;
     pointer-events: none;
     -webkit-text-stroke: 1px black;
+    -moz-text-stroke: 1px black;
 }
 
 .menu-button {
     background: #ff5c00 url(button-gradient.png) repeat-x;
     -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     text-shadow: -1px -2px 2px rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     font-size: 18pt;
@@ -192,8 +206,15 @@ html, body {
   border: 1px solid #19253f;
   /*border-radius: 5px;*/
   -webkit-border-radius: 5px;
-  /*box-shadow: inset 0 1px 10px 1px #5c8bee, 0px 1px 0 #1d2c4d, 0 6px 0px #1f3053, 0 8px 4px 1px #111;*/
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
   -webkit-box-shadow: inset 0 1px 10px 1px #5c8bee, 0px 1px 0 #1d2c4d, 0 6px 0px #1f3053, 0 8px 4px 1px #111;
+  -moz-box-shadow: inset 0 1px 10px 1px #5c8bee, 0px 1px 0 #1d2c4d, 0 6px 0px #1f3053, 0 8px 4px 1px #111;
+  -ms-box-shadow: inset 0 1px 10px 1px #5c8bee, 0px 1px 0 #1d2c4d, 0 6px 0px #1f3053, 0 8px 4px 1px #111;
+  -o-box-shadow: inset 0 1px 10px 1px #5c8bee, 0px 1px 0 #1d2c4d, 0 6px 0px #1f3053, 0 8px 4px 1px #111;
+  box-shadow: inset 0 1px 10px 1px #5c8bee, 0px 1px 0 #1d2c4d, 0 6px 0px #1f3053, 0 8px 4px 1px #111;
   color: #fff;
   font-family: "helvetica neue", helvetica, arial, sans-serif;
   font-weight: bold;
@@ -212,6 +233,10 @@ html, body {
   background: #395591;
   /*box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111;*/
   -webkit-box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111;
+  -moz-box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111;
+  -ms-box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111;
+  -o-box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111;
+  box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111;
   margin-top: 4px;
   margin-bottom: 6px;
 }

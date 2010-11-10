@@ -201,7 +201,7 @@ jam.BoardSprite.prototype.onTouchEnd = function (event) {
 jam.BoardSprite.prototype.onScoreChanged = function (delta) {
     if (delta > 0) {
         var floater = hydra.Sprite.div("floater");
-        floater.element.innerText = "+" + delta;
+        floater.element.textContent = "+" + delta;
         floater.addTask(new hydra.task.Sequence([
             hydra.task.MoveBy.linear(0, -30, 1.5),
             new hydra.task.SelfDestruct()

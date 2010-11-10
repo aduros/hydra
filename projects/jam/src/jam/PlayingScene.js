@@ -73,7 +73,7 @@ jam.PlayingScene.prototype.load = function () {
         pauseScene.addEntity(fader);
 
         var label = new hydra.Sprite(hydra.dom.div("paused"));
-        label.element.innerText = "PAUSED";
+        label.element.textContent = "PAUSED";
         label.setXY(320, 416/2-50);
         label.addTask(new hydra.task.Sequence([
             hydra.task.MoveTo.easeOut(320/2-80, 416/2-50, 1),
@@ -97,7 +97,7 @@ jam.PlayingScene.prototype.load = function () {
     var interstitial = new hydra.Scene("interstitial");
     var ready = new hydra.Sprite(hydra.dom.div("ready"));
     ready.setXY(60, 0);
-    ready.element.innerText = "Ready...";
+    ready.element.textContent = "Ready...";
     ready.element.style.opacity = "0";
     ready.addTask(new hydra.task.Sequence([
         new hydra.task.Parallel([
@@ -110,7 +110,7 @@ jam.PlayingScene.prototype.load = function () {
         ]),
         new hydra.task.CallFunction(function () {
             var go = new hydra.Sprite(hydra.dom.div("go"));
-            go.element.innerText = "GO!";
+            go.element.textContent = "GO!";
             go.setXY(40, 416/3);
             go.setScale(0.25);
             go.addTask(new hydra.task.Sequence([
@@ -144,7 +144,7 @@ jam.PlayingScene.prototype.onScoreChanged = function () {
             hydra.task.ScaleTo.easeIn(1, 1, 0.1)
         ]));
     }
-    this.score.element.innerText = String(jam.ctx.board.score);
+    this.score.element.textContent = String(jam.ctx.board.score);
 }
 
 jam.PlayingScene.prototype.updateClock = function () {
@@ -152,7 +152,7 @@ jam.PlayingScene.prototype.updateClock = function () {
     if (remaining >= 0) {
         var mins = hydra.math.toInt(remaining / 60);
         var secs = remaining % 60;
-        this.clock.element.innerText = mins + ((secs > 9) ? ":" : ":0") + secs;
+        this.clock.element.textContent = mins + ((secs > 9) ? ":" : ":0") + secs;
         if (remaining < 10) {
             this.clock.setCss("color", "red");
         }

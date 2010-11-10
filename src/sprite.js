@@ -196,6 +196,7 @@ hydra.Sprite.prototype.setCss = function (property, value) {
 }
 
 hydra.Sprite.prototype.pageToLocal = function (pageX, pageY) {
+    // TODO: Remove webkit dependency
     var global = new WebKitPoint(pageX, pageY);
     return window.webkitConvertPointFromPageToNode(this.element, global);
 }
