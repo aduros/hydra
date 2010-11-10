@@ -120,7 +120,7 @@ tetris.PlayingScene.prototype.onNextPiece = function (p, preview) {
 }
 
 tetris.PlayingScene.prototype.onScoreChanged = function () {
-    this.score.element.innerText = String(tetris.ctx.board.score);
+    this.score.element.textContent = String(tetris.ctx.board.score);
     if (tetris.ctx.board.score > 0) {
         this.score.setScale(2);
         this.score.addTask(hydra.task.ScaleTo.easeIn(1, 1, 1));
@@ -129,7 +129,7 @@ tetris.PlayingScene.prototype.onScoreChanged = function () {
 
 tetris.PlayingScene.prototype.onLevelChanged = function () {
     this.stepDelay.delay = 1000/tetris.ctx.board.level;
-    this.level.element.innerText = "LVL " + tetris.ctx.board.level;
+    this.level.element.textContent = "LVL " + tetris.ctx.board.level;
     if (tetris.ctx.board.level > 1) {
         this.marquee.setText(tetris.soy.levelUp(tetris.ctx.board));
         this.level.setScale(2);

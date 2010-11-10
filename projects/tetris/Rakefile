@@ -2,5 +2,6 @@ import "../../hydra.rake"
 
 ENTRY_POINT = "tetris.main"
 DEBUG = true
+DEFAULT_TARGET = "ff3"
 
 task :default => :deploy

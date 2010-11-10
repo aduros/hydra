@@ -4,6 +4,6 @@ goog.provide("tetris.util");
 
 tetris.util.createBlock = function (color) {
     var block = hydra.dom.div("block");
-    block.style.backgroundPositionX = -tetris.BoardSprite.BLOCK_SIZE*color + "px";
+    block.style.backgroundPosition = -tetris.BoardSprite.BLOCK_SIZE*color + "px 0";
     return block;
 }

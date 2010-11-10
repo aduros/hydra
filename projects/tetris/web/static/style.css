@@ -13,8 +13,15 @@ html, body {
     color: #FFF;
     -webkit-box-align: center;
     -webkit-box-pack: center;
-    display: 0;
+    -moz-box-align: center;
+    -moz-box-pack: center;
+    padding: 0;
     margin: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-box; /** Not yet supported */
+    display: -o-box; /** Ditto */
+    display: box;
 }
 
 .stage {
@@ -63,6 +70,8 @@ html, body {
     font-family: tobec, helvetica, sans-serif;
     font-size: 24px;
     -webkit-transform: rotate(-4deg);
+    -moz-transform: rotate(-4deg);
+    -o-transform: rotate(-4deg);
     text-shadow: #000 0 1px;
     text-align: right;
 }
@@ -75,6 +84,8 @@ html, body {
     font-family: tobec, helvetica, sans-serif;
     font-size: 14px;
     -webkit-transform: rotate(-4deg);
+    -moz-transform: rotate(-4deg);
+    -o-transform: rotate(-4deg);
     text-shadow: #000 0 1px;
 }
 
@@ -105,6 +116,10 @@ html, body {
     width: 320px;
     text-align: center;
     -webkit-box-shadow: #222 0 0 40px 20px;
+    -moz-box-shadow: #222 0 0 40px 20px;
+    -ms-box-shadow: #222 0 0 40px 20px;
+    -o-box-shadow: #222 0 0 40px 20px;
+    box-shadow: #222 0 0 40px 20px;
     padding-top: 10px;
 }
 
@@ -144,7 +159,15 @@ html, body {
 .button-big {
     background: #ff5c00 url(button-gradient.png) repeat-x;
     -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    -ms-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    -o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     text-shadow: -1px -2px 2px rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     font-size: 18pt;
@@ -159,6 +182,10 @@ html, body {
 
 .button-down {
     -webkit-transform: translate3d(0, 2px, 0);
+    -moz-transform: translate(0, 2px);
+    -o-transform: translate(0, 2px);
+    -ms-transform: translate(0, 2px);
+    transform: translate(0, 2px);
 }
 
 .button-quit, .button-scores, .button-back {
