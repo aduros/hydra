@@ -2,6 +2,8 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -webkit-text-size-adjust: none;
+    position: absolute;
+    cursor: default;
 }
 
 html, body {
@@ -15,30 +17,29 @@ html, body {
     -webkit-box-pack: center;
     -moz-box-align: center;
     -moz-box-pack: center;
+    box-align: center;
+    box-pack: center;
     padding: 0;
     margin: 0;
     display: -webkit-box;
     display: -moz-box;
-    display: -ms-box; /** Not yet supported */
-    display: -o-box; /** Ditto */
     display: box;
 }
 
-.stage {
+#hydra-stage {
     width: 320px;
     height: 416px;
     overflow: hidden;
     position: relative;
 }
 
-.stage * {
-    position: absolute;
-    cursor: default;
+.button {
+    cursor: pointer;
 }
 
-.button, .button * {
-    cursor: pointer !important;
-}
+/**
+ * Game specific styles
+ */
 
 @font-face {
     font-family: tobec;
