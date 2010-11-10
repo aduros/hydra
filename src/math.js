@@ -102,7 +102,10 @@ hydra.interpolators.LINEAR = function (t, a, b, d) {
 }
 
 // TODO
-hydra.interpolators.EASE_IN = hydra.interpolators.LINEAR;
+hydra.interpolators.EASE_IN = function (t, a, b, d) {
+    t /= d;
+    return (b-a)*t*t + a;
+}
 
 // TODO
 hydra.interpolators.EASE_OUT = hydra.interpolators.LINEAR;
