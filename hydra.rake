@@ -93,4 +93,4 @@ task :prepare => :clean do
     cp_r("web", "build/deploy");
 end
 
-task :deploy => [:prepare, :css, :launcher, :soy, :js_all]
+task :deploy => [:prepare, :css, :soy, :launcher, :js_all]
