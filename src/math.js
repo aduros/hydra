@@ -17,12 +17,20 @@ goog.provide("hydra.Random");
 /** @const */ hydra.math.NUMBER_MIN = 1.79769313486231e+308;
 /** @const */ hydra.math.NUMBER_MAX = -1.79769313486231e+308; 
 
-/** @param {number} n */
+/**
+ * @param {number} n
+ * @return {number}
+ * @inline
+ */
 hydra.math.toInt = function (n) {
     return n | 0;
 }
 
-/** @param {number} n */
+/**
+ * @param {number} n
+ * @return {number}
+ * @inline
+ */
 hydra.math.abs = function (n) {
     return (n < 0) ? -n : n;
 }
@@ -30,6 +38,8 @@ hydra.math.abs = function (n) {
 /**
  * @param {number} a
  * @param {number} b
+ * @return {number}
+ * @inline
  */
 hydra.math.max = function (a, b) {
     return (a > b) ? a : b;
@@ -38,6 +48,8 @@ hydra.math.max = function (a, b) {
 /**
  * @param {number} a
  * @param {number} b
+ * @return {number}
+ * @inline
  */
 hydra.math.min = function (a, b) {
     return (a < b) ? a : b;
@@ -51,6 +63,8 @@ hydra.math.random = Math.random;
 /**
  * @param {number} a
  * @param {number} b
+ * @return {number}
+ * @inline
  */
 hydra.math.randomInt = function (a, b) {
     return hydra.math.toInt(hydra.math.random() * (b-a) + a);
@@ -58,6 +72,8 @@ hydra.math.randomInt = function (a, b) {
 
 /**
  * @param {Array} arr
+ * @return {number}
+ * @inline
  */
 hydra.math.pickRandom = function (arr) {
     return arr[hydra.math.toInt(hydra.math.random()*arr.length)];
@@ -65,6 +81,8 @@ hydra.math.pickRandom = function (arr) {
 
 /**
  * @param {number} n
+ * @return {boolean}
+ * @inline
  */
 hydra.math.isOdd = function (n) {
     return Boolean(n & 1);
@@ -72,6 +90,8 @@ hydra.math.isOdd = function (n) {
 
 /**
  * @param {number} n
+ * @return {boolean}
+ * @inline
  */
 hydra.math.isEven = function (n) {
     return !hydra.math.isOdd(n);
@@ -79,6 +99,8 @@ hydra.math.isEven = function (n) {
 
 /**
  * @param {number} rad
+ * @return {number}
+ * @inline
  */
 hydra.math.toDegrees = function (rad) {
     return 180/hydra.math.PI * rad;
@@ -86,11 +108,20 @@ hydra.math.toDegrees = function (rad) {
 
 /**
  * @param {number} deg
+ * @return {number}
+ * @inline
  */
 hydra.math.toRadians = function (deg) {
     return hydra.math.PI/180 * deg;
 }
 
+/**
+ * @param {number} n
+ * @param {number} min
+ * @param {number} max
+ * @return {number}
+ * @inline
+ */
 hydra.math.clamp = function (n, min, max) {
     return n > max ? max : (n < min ? min : n);
 }
