@@ -404,7 +404,8 @@ hydra.task.TransitionAnimation.prototype.interpolate = function (from, to) {
 hydra.task.TransitionAnimation.prototype["handleEvent"] = function (event) {
     if (event["propertyName"] == this.propName) {
         this.state = hydra.task.TransitionAnimation.State.FINISHED;
-        event.target.removeEventListener(hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
+        event.target.removeEventListener(hydra.platform.IS_FF4 ?
+            "transitionend" : hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
     }
 }
 
@@ -434,7 +435,8 @@ hydra.task.TransitionAnimation.prototype.update = function (dt, sprite) {
 
                 // Cast because the compiler doesn't think 'this' is an EventListener
                 /** @type object */ var element = sprite.element;
-                element.addEventListener(hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
+                element.addEventListener(hydra.platform.IS_FF4 ?
+                    "transitionend" : hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
 
                 /** @private */
                 this.elapsed = 0;
@@ -469,7 +471,8 @@ hydra.task.TransitionAnimation.prototype.stop = function (sprite) {
 
         // Cast because the compiler doesn't think 'this' is an EventListener
         /** @type object */ var element = sprite.element;
-        element.removeEventListener(hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
+        element.removeEventListener(hydra.platform.IS_FF4 ?
+            "transitionend" : hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
 
         sprite.element.style.setProperty(this.propName, currentValue, "");
     }
@@ -493,7 +496,8 @@ hydra.task.TransitionAnimation.prototype.start = function (sprite) {
 
             // Cast because the compiler doesn't think 'this' is an EventListener
             /** @type object */ var element = sprite.element;
-            element.addEventListener(hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
+            element.addEventListener(hydra.platform.IS_FF4 ?
+                "transitionend" : hydra.platform.VENDOR_PREFIX + "TransitionEnd", this, false);
 
         } else {
             this.state = hydra.task.TransitionAnimation.State.FINISHED;

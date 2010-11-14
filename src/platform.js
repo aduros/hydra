@@ -55,9 +55,11 @@ hydra.platform.IS_IE9 = (hydra.platform.COMPILED_TARGET == hydra.platform.Target
 hydra.platform.HAS_CSS_TRANSITIONS = hydra.platform.IS_WEBKIT; // || hydra.platform.IS_FF4;
 hydra.platform.HAS_TRANSLATE3D = hydra.platform.IS_WEBKIT;
 hydra.platform.HAS_REQUEST_ANIMATION = hydra.platform.IS_FF4;
+hydra.platform.HAS_CLASS_LIST = hydra.platform.IS_FF4; // Recent webkits also have it, but meh
 
 /**
  * Prefix a css property with the proper vendor prefix.
+ * @inline
  */
 hydra.platform.prefixCss = function (propName) {
     return "-" + hydra.platform.VENDOR_PREFIX + "-" + propName;

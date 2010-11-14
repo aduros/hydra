@@ -5,21 +5,27 @@ goog.require("hydra.platform");
 /**
  * @param {Element} element
  * @param {string} className
+ * @inline
  */
 hydra.dom.hasClass = function (element, className) {
-    // TODO: Use classList for supported browsers?
-    return (" " + element.className + " ").indexOf(" " + className + " ") >= 0;
-//    return RegExp("\\b" + className + "\\b").test(element.className);
+    if (hydra.platform.HAS_CLASS_LIST) {
+        return element["classList"]["contains"](className);
+    } else {
+        return (" " + element.className + " ").indexOf(" " + className + " ") >= 0;
+        //return RegExp("\\b" + className + "\\b").test(element.className);
+    }
 }
 
 /**
  * @param {Element} element
  * @param {string} className
+ * @inline
  */
 hydra.dom.addClass = function (element, className) {
-    // TODO: Use classList for supported browsers?
     if (element.className) {
-        if (!hydra.dom.hasClass(element, className)) {
+        if (hydra.platform.HAS_CLASS_LIST) {
+            return element["classList"]["add"](className);
+        } else if (!hydra.dom.hasClass(element, className)) {
             element.className += " " + className;
         }
     } else {
@@ -30,18 +36,20 @@ hydra.dom.addClass = function (element, className) {
 /**
  * @param {Element} element
  * @param {string} className
+ * @inline
  */
 hydra.dom.removeClass = function (element, className) {
-    // TODO: Use classList for supported browsers?
-
     //var x = (" " + element.className + " ");
     //element.className = x.replace(" " + className + " ", " ");//.trim();
-
-    var arr = element.className.split(" ");
-    var idx = arr.indexOf(className);
-    if (idx >= 0) {
-        arr.splice(idx, 1);
-        element.className = arr.join(" ");
+    if (hydra.platform.HAS_CLASS_LIST) {
+        element["classList"]["remove"](className);
+    } else {
+        var arr = element.className.split(" ");
+        var idx = arr.indexOf(className);
+        if (idx >= 0) {
+            arr.splice(idx, 1);
+            element.className = arr.join(" ");
+        }
     }
 }
 
@@ -49,10 +57,27 @@ hydra.dom.removeClass = function (element, className) {
  * @param {Element} element
  * @param {string} from
  * @param {string} to
+ * @inline
  */
 hydra.dom.replaceClass = function (element, from, to) {
+    // TODO: Use classList here? Not sure if a remove() then add would be faster
     var x = (" " + element.className + " ");
     element.className = x.replace(" " + from + " ", " " + to + " ");//.trim();
+}
+
+/**
+ * @param {Element} element
+ * @param {string} className
+ * @inline
+ */
+hydra.dom.toggleClass = function (element, className) {
+    if (hydra.platform.HAS_CLASS_LIST) {
+        element["classList"]["toggle"](className);
+    } else if (hydra.dom.hasClass(element, className)) {
+        hydra.dom.removeClass(element, className);
+    } else {
+        hydra.dom.addClass(element, className);
+    }
 }
 
 /**
@@ -62,32 +87,40 @@ hydra.dom.replaceClass = function (element, from, to) {
  * @param {string} timingFunction
  */
 hydra.dom.addTransition = function (style, property, duration, timingFunction) {
-    var transitionProperty = style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"];
+    var transitionProperty = style.getPropertyValue(
+        hydra.platform.prefixCss("transition-property"));
     if (transitionProperty) {
         var allProperties = transitionProperty.split(", ");
         var idx = allProperties.indexOf(property);
         if (idx < 0) {
             // Append a new transition
-            style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] += ", " + property;
-            style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] += ", " + duration;
-            style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] += ", " + timingFunction;
+            style.setProperty(hydra.platform.prefixCss("transition-property"),
+                transitionProperty + ", " + property, "");
+            style.setProperty(hydra.platform.prefixCss("transition-duration"),
+                style.getPropertyValue(hydra.platform.prefixCss("transition-duration")) + ", " + duration, "");
+            style.setProperty(hydra.platform.prefixCss("transition-timing-function"),
+                style.getPropertyValue(hydra.platform.prefixCss("transition-timing-function")) + ", " + timingFunction, "");
 
         } else {
             // Update the existing transition settings to the new values
-            var allDurations = style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"].split(", ");
+            var allDurations = style.getPropertyValue(
+                hydra.platform.prefixCss("transition-duration")).split(", ");
             allDurations[idx] = duration;
-            style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = allDurations.join(", ");
+            style.setProperty(hydra.platform.prefixCss("transition-duration"),
+                allDurations.join(", "), "");
 
-            var allTimingFunctions = style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"].split(", ");
-            allTimingFunctions[idx] = duration;
-            style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = allTimingFunctions.join(", ");
+            var allTimingFunctions = style.getPropertyValue(
+                hydra.platform.prefixCss("transition-timing-function")).split(", ");
+            allTimingFunctions[idx] = timingFunction;
+            style.setProperty(hydra.platform.prefixCss("transition-timing-function"),
+                allTimingFunctions.join(", "), "");
         }
 
     } else {
         // transition-property is empty, just set them
-        style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] = property;
-        style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = duration;
-        style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = timingFunction;
+        style.setProperty(hydra.platform.prefixCss("transition-property"), property, "");
+        style.setProperty(hydra.platform.prefixCss("transition-duration"), duration, "");
+        style.setProperty(hydra.platform.prefixCss("transition-timing-function"), timingFunction, "");
     }
 }
 
@@ -96,28 +129,33 @@ hydra.dom.addTransition = function (style, property, duration, timingFunction) {
  * @param {string} property
  */
 hydra.dom.removeTransition = function (style, property) {
-    var transitionProperty = style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"];
+    var transitionProperty = style.getPropertyValue(
+        hydra.platform.prefixCss("transition-property"));
     if (transitionProperty) {
         var allProperties = transitionProperty.split(", ");
         var idx = allProperties.indexOf(property);
         if (idx >= 0) {
             if (allProperties.length > 1) {
                 allProperties.splice(idx, 1);
-                style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] = allProperties.join(", ");
+                style.setProperty(hydra.platform.prefixCss("transition-property"),
+                    allProperties.join(", "), "");
 
-                var allDurations = style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"].split(", ");
+                var allDurations = style.getPropertyValue(
+                    hydra.platform.prefixCss("transition-duration")).split(", ");
                 allDurations.splice(idx, 1);
-                style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = allDurations.join(", ");
+                style.setProperty(hydra.platform.prefixCss("transition-duration"),
+                    allDurations.join(", "), "");
 
-                var allTimingFunctions = style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"].split(", ");
+                var allTimingFunctions = style.getPropertyValue(
+                    hydra.platform.prefixCss("transition-timing-function")).split(", ");
                 allTimingFunctions.splice(idx, 1);
-                style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = allTimingFunctions.join(", ");
-
+                style.setProperty(hydra.platform.prefixCss("transition-timing-function"),
+                    allTimingFunctions.join(", "), "");
             } else {
                 // Shortcut: If this property was the only transition, simply clear everything
-                style[hydra.platform.VENDOR_PREFIX + "TransitionProperty"] = "";
-                style[hydra.platform.VENDOR_PREFIX + "TransitionDuration"] = "";
-                style[hydra.platform.VENDOR_PREFIX + "TransitionTimingFunction"] = "";
+                style.setProperty(hydra.platform.prefixCss("transition-property"), "", "");
+                style.setProperty(hydra.platform.prefixCss("transition-duration"), "", "");
+                style.setProperty(hydra.platform.prefixCss("transition-timing-function"), "", "");
             }
         }
     }
