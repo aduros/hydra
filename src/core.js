@@ -8,6 +8,7 @@ goog.require("hydra.analytics");
 goog.require("hydra.array");
 goog.require("hydra.Group");
 goog.require("hydra.ListenerManager");
+goog.require("hydra.platform");
 
 /**
  * @private
@@ -119,8 +120,11 @@ hydra.director.pushScene = function (scene) {
     scene.enter();
 }
 
-hydra.director.tick = function () {
-    var startTime = Date.now();
+/**
+ * @private
+ */
+hydra.director.tick = function (timestamp) {
+    var startTime = hydra.platform.HAS_REQUEST_ANIMATION ? timestamp : Date.now();
     var elapsed = startTime - hydra.lastTime;
 
     if (goog.DEBUG) {
@@ -128,26 +132,30 @@ hydra.director.tick = function () {
         fpsTime += elapsed;
         if (fpsTime > 1000) {
             var fps = 1000*fpsFrames/fpsTime;
-            fpsElement.innerText = "FPS: " + fps.toFixed(2);
+            fpsElement.textContent = "FPS: " + fps.toFixed(2);
             fpsTime = 0;
             fpsFrames = 0;
         }
     }
-//    console.log("Elapsed: " + elapsed);
 
     hydra.currentScene.update(elapsed);
-
-//    console.log("Update time: " + (Date.now() - timeBegin));
-//    console.log("Scene count: " + scenes.length);
-
     hydra.lastTime = startTime;
+
+    if (hydra.platform.HAS_REQUEST_ANIMATION) {
+        window[hydra.platform.VENDOR_PREFIX + "RequestAnimationFrame"](hydra.director.tick);
+    }
 }
 
 hydra.director.init = function (scene) {
     hydra.director.pushScene(scene);
 
     hydra.lastTime = Date.now();
-    setInterval(hydra.director.tick, 1); // TODO: Tone this down?
+    if (hydra.platform.HAS_REQUEST_ANIMATION) {
+        window[hydra.platform.VENDOR_PREFIX + "RequestAnimationFrame"](hydra.director.tick);
+    } else {
+        setInterval(hydra.director.tick, 1000/30); // TODO: Tone this down?
+    }
+
 //    hydra.director.tick();
 }
 

@@ -52,8 +52,9 @@ hydra.platform.IS_UNSUPPORTED =
 hydra.platform.IS_IE9 = (hydra.platform.COMPILED_TARGET == hydra.platform.Target.IE9);
 
 // Capabilities
-hydra.platform.HAS_CSS_TRANSITIONS = hydra.platform.IS_WEBKIT || hydra.platform.IS_FF4;
+hydra.platform.HAS_CSS_TRANSITIONS = hydra.platform.IS_WEBKIT; // || hydra.platform.IS_FF4;
 hydra.platform.HAS_TRANSLATE3D = hydra.platform.IS_WEBKIT;
+hydra.platform.HAS_REQUEST_ANIMATION = hydra.platform.IS_FF4;
 
 /**
  * Prefix a css property with the proper vendor prefix.
