@@ -20,7 +20,7 @@ function getTarget () {
     if (goog.userAgent.WEBKIT) { // TODO: Find earliest supported version
         return "webkit";
     } else if (goog.userAgent.GECKO) {
-        if (isVersion("2.0")) {
+        if (isVersion("2.0b")) {
             return "ff4";
         } else if (isVersion("1.8")) {
             return "ff3";
