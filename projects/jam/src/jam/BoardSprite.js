@@ -162,7 +162,9 @@ jam.BoardSprite.prototype.onTouchMove = function (event) {
         return;
     }
     var touch = event.touches[0];
-    var local = this.pageToLocal(touch.pageX, touch.pageY);
+    // So, so broken
+    var local = hydra.platform.IS_WEBKIT ?
+        this.pageToLocal(touch.pageX, touch.pageY) : {x: touch.pageX, y: touch.pageY-this.y};
     local.x = hydra.math.clamp(local.x, 0, jam.BoardSprite.WIDTH-1);
     local.y = hydra.math.clamp(local.y, 0, jam.BoardSprite.HEIGHT-1);
 
