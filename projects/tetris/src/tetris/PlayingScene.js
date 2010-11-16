@@ -87,12 +87,13 @@ tetris.PlayingScene.prototype.load = function () {
     this.registerListener(tetris.ctx.board, tetris.BoardEvent.SCORE_CHANGED, goog.bind(this.onScoreChanged, this));
     this.registerListener(tetris.ctx.board, tetris.BoardEvent.LEVEL_CHANGED, goog.bind(this.onLevelChanged, this));
 
-    this.registerListener(document, "keydown", goog.bind(this.onKeyDown, this));
+    //this.registerListener(window.frameElement, "keydown", goog.bind(this.onKeyDown, this));
+    this.registerListener(window, "keydown", goog.bind(this.onKeyDown, this));
 
     this.inputState = tetris.InputState.NONE;
-    this.registerListener(document, "touchstart", goog.bind(this.onTouchStart, this));
-    this.registerListener(document, "touchmove", goog.bind(this.onTouchMove, this));
-    this.registerListener(document, "touchend", goog.bind(this.onTouchEnd, this));
+    this.registerListener(window, "touchstart", goog.bind(this.onTouchStart, this));
+    this.registerListener(window, "touchmove", goog.bind(this.onTouchMove, this));
+    this.registerListener(window, "touchend", goog.bind(this.onTouchEnd, this));
 
     this.stepDelay = new hydra.task.Delay(1);
     this.addTask(new hydra.task.Repeat(new hydra.task.Sequence([

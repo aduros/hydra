@@ -64,6 +64,13 @@ document.addEventListener("touchstart", function (event) {
     window.scrollTo(0, 1);
 }, true);
 
+// Allows keyboard events when embedded in an iframe
+if (window.top != window) {
+    window.addEventListener("click", function (event) {
+        window.focus();
+    }, true);
+}
+
 // App caching
 if ("applicationCache" in window) {
     applicationCache.addEventListener("updateready", applicationCache.swapCache, false);
