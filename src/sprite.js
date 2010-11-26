@@ -174,7 +174,7 @@ hydra.Sprite.prototype.getRotation = function () {
 
 hydra.Sprite.prototype.updateTransform = function () {
     if (hydra.platform.HAS_TRANSLATE3D) {
-        // translate3d is a hint for hardware acceleration on at least webkit
+        // translate3d is a hint for hardware acceleration
         this.element.style[hydra.platform.VENDOR_PREFIX + "Transform"] =
             "translate3d(" + this.x + "px," + this.y + "px,0)" +
             "rotate(" + this.rotation + "deg)" +
@@ -195,10 +195,18 @@ hydra.Sprite.prototype.setCss = function (property, value) {
     this.element.style.setProperty(property, value, "");
 }
 
+/**
+ * @param {number} pageX
+ * @param {number} pageY
+ * @return {WebKitPoint}
+ */
 hydra.Sprite.prototype.pageToLocal = function (pageX, pageY) {
-    // TODO: Remove webkit dependency
-    var global = new WebKitPoint(pageX, pageY);
-    return window.webkitConvertPointFromPageToNode(this.element, global);
+    if (hydra.platform.IS_WEBKIT) {
+        var global = new WebKitPoint(pageX, pageY);
+        return window.webkitConvertPointFromPageToNode(this.element, global);
+    } else {
+        throw new Error("pageToLocal is not yet supported on this target");
+    }
 }
 
 /**
