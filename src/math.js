@@ -160,16 +160,27 @@ hydra.Random.create = function () {
         hydra.math.randomInt(hydra.math.INT_MIN, hydra.math.INT_MAX+1));
 }
 
+/**
+ * @return {number}
+ */
 hydra.Random.prototype.nextInt = function () {
     this.a = 36969 * (this.a & 65535) + (this.a >> 16);
     this.b = 18000 * (this.b & 65535) + (this.b >> 16);
     return (this.a << 16) + (this.b & 65535);
 }
 
+/**
+ * @return {number}
+ */
 hydra.Random.prototype.nextNumber = function () {
     return (this.nextInt() + (hydra.math.INT_MAX+1)) / (2*hydra.math.INT_MAX+2);
 }
 
+/**
+ * @param {number} x
+ * @param {number} y
+ * @return {number}
+ */
 hydra.Random.prototype.nextRange = function (x, y) {
     return (this.nextInt() & hydra.math.INT_MAX) % (y-x) + x;
 }
