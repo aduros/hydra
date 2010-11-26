@@ -2,17 +2,20 @@ goog.provide("hydra.storage");
 
 goog.require("goog.json");
 
-// Shiv: iOS 3.1 and Android 1.6
-if (!("JSON" in window)) {
-    JSON = {
-        "parse": goog.json.unsafeParse,
-        "stringify": goog.json.serialize
-    };
-}
+// Patch up some older Webkit browsers
+if (hydra.platform.IS_WEBKIT) {
+    // Missing in iOS 3.1 and Android 1.6
+    if (!("JSON" in window)) {
+        JSON = {
+            "parse": goog.json.unsafeParse,
+            "stringify": goog.json.serialize
+        };
+    }
 
-// TODO: Remove, unnecessary?
-if (!("localStorage" in window)) {
-    localStorage = {};
+    // Missing in iOS 2.2 and webOS < 2.0
+    if (!("localStorage" in window)) {
+        localStorage = {};
+    }
 }
 
 hydra.storage.set = function (key, value) {
