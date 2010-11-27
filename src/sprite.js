@@ -24,6 +24,8 @@ goog.provide("hydra.task.BasicScaleBy");
 goog.provide("hydra.task.BasicRotateTo");
 goog.provide("hydra.task.BasicRotateBy");
 
+goog.provide("hydra.task.Flicker");
+
 goog.require("hydra.dom");
 goog.require("hydra.interpolators");
 goog.require("hydra.array");
@@ -1384,4 +1386,32 @@ if (hydra.platform.HAS_CSS_TRANSITIONS) {
     hydra.task.ScaleBy.linear = hydra.task.BasicScaleBy.linear;
     hydra.task.ScaleBy.easeIn = hydra.task.BasicScaleBy.easeIn;
     hydra.task.ScaleBy.easeOut = hydra.task.BasicScaleBy.easeOut;
+}
+
+/**
+ * @constructor
+ * @implements {hydra.Task}
+ */
+hydra.task.Flicker = function (delay) {
+    this.delay = 1000*delay;
+    this.elapsed = 0;
+    this.phase = false;
+}
+
+hydra.task.Flicker.prototype.start = function (entity) { }
+
+hydra.task.Flicker.prototype.stop = function (entity) { }
+
+hydra.task.Flicker.prototype.update = function (dt, sprite) {
+    this.elapsed += dt;
+    if (this.elapsed >= this.delay) {
+        this.elapsed = 0;
+        this.phase = false;
+        sprite.element.style.visibility = "";
+        return true;
+    } else {
+        sprite.element.style.visibility = this.phase ? "" : "hidden";
+        this.phase = !this.phase;
+        return false;
+    }
 }
