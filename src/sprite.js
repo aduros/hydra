@@ -372,14 +372,40 @@ hydra.task.BasicAnimation.prototype.getElapsed = function () {
  * @param {hydra.Sprite=} spriteOverride
  */
 hydra.task.TransitionAnimation = function (propName, duration, easing, spriteOverride) {
+    /**
+     * @private
+     */
     this.propName = propName;
+
+    /**
+     * @private
+     */
     this.duration = 1000*duration;
+
+    /**
+     * @private
+     */
     this.easing = easing;
+
+    /**
+     * @private
+     */
     this.spriteOverride = spriteOverride;
 
+    /**
+     * @private
+     */
     this.state = hydra.task.TransitionAnimation.State.RESET;
 
-    /** @type function(number, number, number, number) :number */
+    /**
+     * @private
+     */
+    this.elapsed = 0;
+
+    /**
+     * @private
+     * @type function(number, number, number, number) :number
+     */
     this.interpolator;
 }
 
@@ -460,6 +486,9 @@ hydra.task.TransitionAnimation.prototype.update = function (dt, sprite) {
         case hydra.task.TransitionAnimation.State.FINISHED:
             this.state = hydra.task.TransitionAnimation.State.RESET;
             hydra.dom.removeTransition(sprite.element.style, this.propName);
+
+            this.elapsed = this.duration;
+            this.progress(sprite);
             return true;
     }
 }
