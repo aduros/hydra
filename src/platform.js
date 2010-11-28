@@ -56,6 +56,8 @@ hydra.platform.HAS_CSS_TRANSITIONS = hydra.platform.IS_WEBKIT; // || hydra.platf
 hydra.platform.HAS_TRANSLATE3D = hydra.platform.IS_WEBKIT;
 hydra.platform.HAS_REQUEST_ANIMATION = hydra.platform.IS_FF4;
 hydra.platform.HAS_CLASS_LIST = hydra.platform.IS_FF4; // Recent webkits also have it, but meh
+hydra.platform.HAS_APP_CACHE = hydra.platform.IS_WEBKIT || hydra.platform.IS_GECKO
+    || hydra.platform.IS_OPERA;
 
 /**
  * Prefix a css property with the proper vendor prefix.
