@@ -1,0 +1,111 @@
+/**
+ * Standard Hydra styles
+ */
+
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+    position: absolute;
+    cursor: default;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    font-weight: bold;
+    font-family: helvetica, sans-serif;
+    color: white;
+    margin: 0;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -webkit-box-align: center;
+    -moz-box-pack: center;
+    box-align: center;
+    box-pack: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+}
+
+#hydra-stage {
+    width: 320px;
+    height: 416px;
+    overflow: hidden;
+    position: relative;
+}
+
+#hydra-fps {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    color: white;
+    text-shadow: black 0px 0px 3px;
+}
+
+.button {
+    cursor: pointer;
+}
+
+/**
+ * Game specific styles
+ */
+
+.scene-playing {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.tree {
+    width: 64px;
+    height: 64px;
+    background-image: url(tree.png);
+    top: -55px;
+    left: -32px;
+}
+
+.ramp {
+    width: 54px;
+    height: 32px;
+    /*background-color: blue;*/
+    background-image: url(ramp.png);
+    top: -27px;
+    left: -16px;
+}
+
+.flag-left {
+    width: 54px;
+    height: 54px;
+    background-image: url(flag-left.png);
+    top: -42px;
+    left: -27px;
+}
+
+.flag-right {
+    width: 54px;
+    height: 54px;
+    background-image: url(flag-right.png);
+    top: -42px;
+    left: -27px;
+}
+
+.player {
+    width: 48px;
+    height: 54px;
+    left: -24px;
+    top: -44px;
+    background-image: url(player.png);
+}
+
+.life {
+    height: 32px;
+    background-image: url(pause.png);
+}
+
+.sign {
+    background-color: #ffcc00;
+    border: 2px solid black;
+}

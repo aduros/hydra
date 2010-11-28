@@ -1,0 +1,7 @@
+import "../../hydra.rake"
+
+ENTRY_POINT = "main"
+DEBUG = true
+DEFAULT_TARGET = "webkit"
+
+task :default => :deploy
