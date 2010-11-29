@@ -86,12 +86,12 @@ hydra.Sprite = function (element) {
 goog.inherits(hydra.Sprite, hydra.Entity);
 
 /**
+ * @inline
  * @param {string} className
+ * @return {hydra.Sprite}
  */
 hydra.Sprite.div = function (className) {
-    var sprite = new hydra.Sprite();
-    sprite.element.className = className;
-    return sprite;
+    return new hydra.Sprite(hydra.dom.div(className));
 }
 
 hydra.Sprite.prototype.detach = function () {
@@ -239,7 +239,8 @@ hydra.Group.div = function (className) {
 hydra.Group.prototype.activate = function (scene) {
     goog.base(this, "activate", scene);
     for (var ii = 0; ii < this.children.length; ++ii) {
-        this.children[ii].activate(scene);
+        var child = this.children[ii];
+        scene.addEntity(child, null);
     }
 }
 
@@ -257,6 +258,7 @@ hydra.Group.prototype.destroy = function () {
  * @param {hydra.Sprite} sprite
  */
 hydra.Group.prototype.addSprite = function (sprite) {
+    // TODO: This is WAY too tangled. Simplify sometime
     if (this.isActive() && !sprite.isActive()) {
         this.scene.addEntity(sprite, this);
     } else {

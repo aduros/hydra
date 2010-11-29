@@ -259,8 +259,11 @@ hydra.Entity.prototype.removeTask = function (task) {
 hydra.Entity.prototype.removeAllTasks = function () {
     // Can't simply clear the tasks array, all array splicing must be done in update()
     for (var ii = 0; ii < this.tasks.length; ++ii) {
-        this.tasks[ii].stop(this);
-        this.tasks[ii] = null;
+        var task = this.tasks[ii];
+        if (task) {
+            task.stop(this);
+            this.tasks[ii] = null;
+        }
     }
 }
 
@@ -295,13 +298,19 @@ hydra.Entity.prototype.destroy = function () {
 
 hydra.Entity.prototype.enter = function () {
     for (var ii = 0; ii < this.tasks.length; ++ii) {
-        this.tasks[ii].start(this);
+        var task = this.tasks[ii];
+        if (task) {
+            task.start(this);
+        }
     }
 }
 
 hydra.Entity.prototype.exit = function () {
     for (var ii = 0; ii < this.tasks.length; ++ii) {
-        this.tasks[ii].stop(this);
+        var task = this.tasks[ii];
+        if (task) {
+            task.stop(this);
+        }
     }
 }
 
