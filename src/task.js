@@ -72,14 +72,18 @@ hydra.task.Parallel = function (tasks) {
 hydra.task.Parallel.prototype.stop = function (entity) {
     for (var ii = 0; ii < this.tasks.length; ++ii) {
         var task = this.tasks[ii];
-        task.stop(entity);
+        if (task) {
+            task.stop(entity);
+        }
     }
 }
 
 hydra.task.Parallel.prototype.start = function (entity) {
     for (var ii = 0; ii < this.tasks.length; ++ii) {
         var task = this.tasks[ii];
-        task.start(entity);
+        if (task) {
+            task.start(entity);
+        }
     }
 }
 
