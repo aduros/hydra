@@ -27,12 +27,13 @@ Hydra also aims to be functional:
 Platforms
 ---------
 
-Hydra currently has two heads:
+Hydra currently has three heads:
 
 * iOS 3+ (iPhone, iPod touch, iPad)
 * Android 2.1+
+* Desktop browsers: Chrome, Safari, Firefox, Opera
 
-I'd eventually like to be able to support:
+Targets under development:
 
-* Blackberry OS 6+
-* WebOS (via PhoneGap)
+* Opera Mobile 10
+* Desktop browsers: Internet Explorer 9
