@@ -869,6 +869,26 @@ if (hydra.platform.HAS_CSS_TRANSITIONS) {
     }
 
     /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateTo.easeIn = function (rotation, duration, spriteOverride) {
+        return new hydra.task.TransitionRotateTo(rotation, duration, "ease-in",
+            hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateTo.easeOut = function (rotation, duration, spriteOverride) {
+        return new hydra.task.TransitionRotateTo(rotation, duration, "ease-out",
+            hydra.interpolators.EASE_OUT, spriteOverride);
+    }
+
+    /**
      * @override
      * @param {hydra.Sprite} sprite
      */
@@ -908,6 +928,25 @@ if (hydra.platform.HAS_CSS_TRANSITIONS) {
             hydra.interpolators.LINEAR, spriteOverride);
     }
 
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateBy.easeIn = function (rotation, duration, spriteOverride) {
+        return new hydra.task.TransitionRotateBy(rotation, duration, "ease-in",
+            hydra.interpolators.EASE_IN, spriteOverride);
+    }
+
+    /**
+     * @param {number} rotation
+     * @param {number} duration
+     * @param {hydra.Sprite=} spriteOverride
+     */
+    hydra.task.TransitionRotateBy.easeOut = function (rotation, duration, spriteOverride) {
+        return new hydra.task.TransitionRotateBy(rotation, duration, "ease-out",
+            hydra.interpolators.EASE_OUT, spriteOverride);
+    }
     /**
      * @override
      * @param {hydra.Sprite} sprite
