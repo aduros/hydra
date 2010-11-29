@@ -27,7 +27,9 @@ goog.scope(function () {
 var PlayingScene = ski.PlayingScene;
 
 (function () {
-    hydra.simulator.init();
+    if (!hydra.simulator.supportsTouch) {
+        hydra.simulator.init();
+    }
     hydra.director.init(new PlayingScene());
 
     // Orientation handling
