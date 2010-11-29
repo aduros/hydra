@@ -122,6 +122,7 @@ hydra.director.pushScene = function (scene) {
 
 /**
  * @private
+ * @param {number} timestamp
  */
 hydra.director.tick = function (timestamp) {
     var startTime = hydra.platform.HAS_REQUEST_ANIMATION ? timestamp : Date.now();
@@ -364,7 +365,7 @@ hydra.Scene = function (name) {
      * @protected
      * @type {hydra.Group}
      */
-    this.root = new hydra.Group(hydra.dom.div("scene-" + name));
+    this.root = new hydra.Group(hydra.dom.div("scene scene-" + name));
 
     this.addEntity(this.root, hydra.director.getStage());
 }
@@ -473,7 +474,7 @@ hydra.Scene.prototype.removeTask = function (task) {
     this.root.removeTask(task);
 }
 
-hydra.Scene.prototype.removeAllTasks = function (task) {
+hydra.Scene.prototype.removeAllTasks = function () {
     this.root.removeAllTasks();
 }
 
