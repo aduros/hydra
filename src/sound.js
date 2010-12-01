@@ -97,10 +97,12 @@ hydra.Music.prototype.enter = function () {
 }
 
 hydra.Music.prototype.setEnabled = function (enabled) {
-    if (enabled && !this.enabled) {
-        this.audio.play();
-    } else if (!enabled && this.enabled) {
-        this.audio.pause();
+    if (this.isActive()) {
+        if (enabled && !this.enabled) {
+            this.audio.play();
+        } else if (!enabled && this.enabled) {
+            this.audio.pause();
+        }
     }
     this.enabled = enabled;
 }
