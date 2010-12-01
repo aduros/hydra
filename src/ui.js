@@ -29,6 +29,7 @@ goog.inherits(hydra.Button, hydra.Sprite);
 hydra.Button.prototype.onTap = function () { }
 
 /**
+ * @inline
  * @param {string} className
  * @return {hydra.Button}
  */
