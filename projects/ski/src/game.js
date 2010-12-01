@@ -1,6 +1,8 @@
 goog.provide("ski.PlayingScene");
+goog.provide("ski.MainMenuScene");
 
 goog.require("hydra.task.Flicker");
+goog.require("hydra.Transition");
 
 goog.scope(function () {
 var Scene = hydra.Scene;
@@ -36,7 +38,12 @@ var PlayerState = ski.PlayerState;
 
 ski.TRAIL_RADIUS = 4;
 
-ski.MAX_LIFE = 3;
+ski.MAX_LIFE = 1;
+
+ski.account = hydra.storage.get("ski") || {};
+ski.saveAccount = function () {
+    hydra.storage.set("ski", ski.account);
+}
 
 /**
  * @constructor
@@ -66,6 +73,8 @@ ski.PlayingScene = function () {
 
     this.playerState = PlayerState.NORMAL;
 
+    this.spawnerDelay = new hydra.task.Delay(1);
+    this.left = true;
     this.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
         new hydra.task.CallFunction(function () {
             var hazard;
@@ -82,7 +91,7 @@ ski.PlayingScene = function () {
             }
             self.addHazard(hazard);
         }),
-        new hydra.task.Delay(0.2)
+        this.spawnerDelay
     ])));
 
     this.lifeMeter = Sprite.div("life");
@@ -95,6 +104,10 @@ ski.PlayingScene = function () {
     this.scoreMeter = Sprite.div("score");
     this.setScore(0);
     this.addEntity(this.scoreMeter);
+
+    this.comboMeter = Sprite.div("combo");
+    this.setCombo(0);
+    this.addEntity(this.comboMeter);
 
     var pauseButton = Button.div("pause-button");
     pauseButton.onTap = function () {
@@ -114,6 +127,17 @@ ski.PlayingScene = function () {
         hydra.director.pushScene(pauseScene);
     }
     this.addEntity(pauseButton);
+
+    var muteButton = Button.div("mute-button");
+    muteButton.onTap = function () {
+        var oldValue = muteButton.isToggled();
+        music.setEnabled(oldValue);
+        ski.account["mute"] = !oldValue;
+        ski.saveAccount();
+        muteButton.setToggled(!oldValue);
+    }
+    muteButton.setToggled(ski.account["mute"]);
+    this.addEntity(muteButton);
 
     this.setLevel(1);
 
@@ -143,18 +167,11 @@ ski.PlayingScene = function () {
 
     this.addHazard(new ski.Sign("DANGER"));
 
-    this.addEntity(new hydra.Music("static/music.mp3"));
+    var music = new hydra.Music("static/music.mp3");
+    music.setEnabled(!muteButton.isToggled());
+    this.addEntity(music);
 }
 goog.inherits(ski.PlayingScene, Scene);
-
-///**
-// * @override
-// */
-//ski.PlayingScene.prototype.load = function () {
-//    //var sprite = new Sprite(hydra.dom.div("sprite"));
-//    //sprite.setXY(50, 50);
-//    //this.addEntity(sprite);
-//}
 
 ski.PlayingScene.prototype.setFrame = function (frame) {
     this.player.element.style.backgroundPosition = (frame*-48) + "px 0";
@@ -167,9 +184,14 @@ ski.PlayingScene.prototype.movePlayer = function (x) {
 }
 
 ski.PlayingScene.prototype.onResize = function () {
-    this.snowCtx.canvas.width = window.innerWidth;
+    var width = window.innerWidth;
+
+    this.snowCtx.canvas.width = width;
     this.snowCtx.globalCompositeOperation = "copy";
     this.snowCtx.lineWidth = 2*ski.TRAIL_RADIUS;
+
+    // Wider screens should have more hazards
+    this.spawnerDelay.setDelay(0.2 * 320/width);
 }
 
 /**
@@ -185,7 +207,7 @@ ski.PlayingScene.prototype.update = function (dt) {
     this.elapsed += dt;
     if (this.elapsed > 10000) {
         this.elapsed -= 10000;
-        var sign = new ski.Sign("Level " + this.level);
+        var sign = new ski.Sign("Level " + (this.level+1));
         var self = this;
         sign.onPass = function () {
             self.setLevel(self.level+1);
@@ -270,6 +292,7 @@ ski.PlayingScene.prototype.damagePlayer = function () {
         ]));
     }
     this.setLife(this.life-1);
+    //this.setCombo(0);
 }
 
 ski.PlayingScene.prototype.setLife = function (life) {
@@ -281,19 +304,50 @@ ski.PlayingScene.prototype.setLife = function (life) {
         this.player.removeAllTasks();
         this.removeAllTasks();
 
+        ski.account["bestScore"] = hydra.math.max(this.score, hydra.math.toInt(ski.account["bestScore"]));
+
         this.playerChassis.addTask(new hydra.task.Sequence([
             hydra.task.MoveTo.easeOut(this.playerChassis.getX(), 0.5*window.innerHeight, 0.5*this.delay),
             new hydra.task.CallFunction(function () {
-                var gameOverScene = new hydra.Scene("gameover");
-                gameOverScene.registerListener(window, "click", function () {
-                    hydra.director.unwindToScene(new ski.PlayingScene());
-                });
+                var gameOverScene = new Scene("gameover");
+
+                // This should be templated, but I don't want to bring in Soy just for this.
+                // I'll find a more light weight template compiler at some point... or roll my own.
+                var menuDiv = hydra.dom.renderDiv("<div class='gameover menu'>" +
+                    "<div class='gameover-title'>Game Over</div>" +
+                    "<div class='gameover-body'>Your personal best score is " + ski.account["bestScore"] + "</div>" +
+                    "<div class='action-button'>Replay</div>" +
+                    "<div class='action-button'>Menu</div>" +
+                "</div>");
+
+                var menu = new Sprite(menuDiv);
+                menu.setY(-20);
+                menu.addTask(hydra.task.MoveTo.linear(0, 0, 1));
+                menu.setCss("opacity", "0");
+                menu.addTask(hydra.task.StyleTo.linear("opacity", "1", 1));
+                gameOverScene.addEntity(menu);
+
+                var replayButton = new Button(menuDiv.getElementsByClassName("action-button")[0]);
+                replayButton.onTap = function () {
+                    hydra.director.replaceScene(new ski.AvalancheTransition(
+                        new ski.PlayingScene()));
+                }
+                gameOverScene.addEntity(replayButton, null);
+
+                var quitButton = new Button(menuDiv.getElementsByClassName("action-button")[1]);
+                quitButton.onTap = function () {
+                    hydra.director.replaceScene(new ski.AvalancheTransition(
+                        new ski.MainMenuScene()));
+                }
+                gameOverScene.addEntity(quitButton, null);
+
                 hydra.director.pushScene(gameOverScene);
             })
         ]));
         this.player.addTask(hydra.task.RotateTo.easeOut(360*3 + 45, 0.5*this.delay));
 
         this.setSpeed(0);
+        this.setCombo(0);
         //this.setFrame(3);
         this.playerState = PlayerState.DEAD;
     }
@@ -303,7 +357,25 @@ ski.PlayingScene.prototype.setLife = function (life) {
 
 ski.PlayingScene.prototype.setScore = function (score) {
     this.score = score;
-    this.scoreMeter.element.textContent = "Score: " + score;
+    this.scoreMeter.element.textContent = String(score);
+}
+
+ski.PlayingScene.prototype.setCombo = function (combo) {
+    this.comboMeter.removeAllTasks();
+    if (combo > 1) {
+        this.comboMeter.element.style.opacity = "";
+        this.comboMeter.element.textContent = combo + " Combo!";
+        this.comboMeter.setScale(1.2);
+        this.comboMeter.setY(0);
+        this.comboMeter.addTask(hydra.task.ScaleTo.easeOut(1, 1, 0.2));
+    } else if (this.combo > combo) {
+        this.comboMeter.setScale(1);
+        this.comboMeter.addTask(hydra.task.MoveTo.linear(0, 30, 0.5));
+        this.comboMeter.addTask(hydra.task.StyleTo.linear("opacity", "0", 0.5));
+    } else {
+        this.comboMeter.element.style.opacity = "0";
+    }
+    this.combo = combo;
 }
 
 ski.PlayingScene.prototype.jumpPlayer = function () {
@@ -339,11 +411,11 @@ ski.PlayingScene.prototype.addHazard = function (hazard) {
 
 ski.PlayingScene.prototype.setLevel = function (level) {
     this.level = level;
-    this.setSpeed(Math.sqrt(level)); // TODO: Use sine curve
+    this.setSpeed(0.75 + level*0.25);
 }
 
 ski.PlayingScene.prototype.setSpeed = function (speed) {
-    this.speedMeter.element.textContent = speed + " km/h";
+    this.speedMeter.element.textContent = hydra.math.toInt(30*speed) + " km/h";
     this.delay = 3 / speed;
 }
 
@@ -420,9 +492,11 @@ ski.Flag.prototype.onHit = function (scene) {
 ski.Flag.prototype.onPass = function (scene) {
     if (scene.playerChassis.getX() < this.getX() == this.left) {
         this.element.style.backgroundColor = "lime";
-        scene.setScore(scene.score + 200);
+        scene.setCombo(scene.combo + 1);
+        scene.setScore(scene.score + 200 + 10 * scene.combo);
     } else {
         this.element.style.backgroundColor = "yellow";
+        scene.setCombo(0);
     }
 }
 
@@ -465,7 +539,7 @@ ski.Candy.prototype.onHit = function (scene) {
     if (this.contents) {
         this.removeAllTasks();
         this.addTask(new hydra.task.Sequence([
-            hydra.task.MoveTo.linear(0, 0, 1),
+            hydra.task.MoveTo.linear(16, 16, 1),
             new hydra.task.SelfDestruct()
         ]));
         this.contents.addTask(hydra.task.RotateTo.linear(3*360, 1));
@@ -483,4 +557,143 @@ ski.Candy.prototype.onHit = function (scene) {
     }
 }
 
+/**
+ * @constructor
+ * @extends {hydra.Transition}
+ */
+ski.AvalancheTransition = function (nextScene) {
+    goog.base(this, nextScene);
+}
+goog.inherits(ski.AvalancheTransition, hydra.Transition);
+
+ski.AvalancheTransition.prototype.load = function () {
+    goog.base(this, "load");
+
+    var prevScene = hydra.director.getPreviousScene();
+    var self = this;
+    var duration = 1;
+
+    this.nextScene.getRoot().setCss("visibility", "hidden");
+
+    var snow = Sprite.div("avalanche");
+    snow.setY(-window.innerHeight);
+    snow.addTask(new hydra.task.Sequence([
+        hydra.task.MoveTo.linear(0, 0, duration),
+        new hydra.task.CallFunction(function () {
+            prevScene.getRoot().setCss("visibility", "hidden");
+            self.nextScene.getRoot().setCss("visibility", "");
+        }),
+        hydra.task.MoveTo.linear(0, window.innerHeight, duration),
+        new hydra.task.CallFunction(function () {
+            self.complete();
+        })
+    ]));
+    this.addEntity(snow);
+}
+
+/**
+ * @constructor
+ * @extends {Scene}
+ */
+ski.MainMenuScene = function () {
+    goog.base(this, "main");
+}
+goog.inherits(ski.MainMenuScene, Scene);
+
+ski.MainMenuScene.prototype.load = function () {
+    var canvas = document.createElement("canvas");
+    this.snowCtx = canvas.getContext("2d");
+    this.addEntity(new Sprite(canvas));
+
+    this.player = Sprite.div("player");
+    this.player.element.style.backgroundPosition = "-48px";
+    this.addEntity(this.player);
+
+    //this.addEntity(Sprite.div("logo"));
+
+    // This should be templated, but I don't want to bring in Soy just for this.
+    // I'll find a more light weight template compiler at some point... or roll my own.
+    var menuDiv = hydra.dom.renderDiv(
+        "<div class='main menu'>" +
+            "<div class='logo'></div>" +
+            "<div class='action-button'>Play</div>" +
+            "<div class='action-button'>Quit</div>" +
+        "</div>");
+    this.addEntity(new Sprite(menuDiv));
+
+    var playButton = new Button(menuDiv.getElementsByClassName("action-button")[0]);
+    playButton.onTap = function () {
+        hydra.director.pushScene(new ski.AvalancheTransition(new ski.PlayingScene()));
+    };
+    this.addEntity(playButton, null);
+
+    var quitButton = new Button(menuDiv.getElementsByClassName("action-button")[1]);
+    quitButton.onTap = function () {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.close();
+            window.location = "http://google.com"; // We'll get here if close() was refused
+        }
+    };
+    this.addEntity(quitButton, null);
+
+    this.addEntity(new Sprite(hydra.dom.renderDiv("<div class='credit'>by @b_garcia</div>")));
+
+    this.elapsed = 0;
+    this.resetAnim();
+
+    var self = this;
+    this.registerListener(window, "resize", function () {
+        self.onResize();
+    });
+    this.onResize();
+    //this.addEntity(new Sprite(hydra.dom.renderDiv("<div>")));
+}
+
+ski.MainMenuScene.prototype.onResize = function () {
+    this.snowCtx.canvas.width = window.innerWidth;
+    this.snowCtx.canvas.height = window.innerHeight;
+    this.snowCtx.globalCompositeOperation = "copy";
+    this.snowCtx.lineWidth = 2*ski.TRAIL_RADIUS;
+}
+
+ski.MainMenuScene.prototype.resetAnim = function () {
+    var w = window.innerWidth;
+    this.startX = hydra.math.randomInt(w*0.2, w*0.8);
+    this.player.setXY(this.startX, 0);
+}
+
+ski.MainMenuScene.prototype.update = function (dt) {
+    goog.base(this, "update", dt);
+
+    this.elapsed += dt;
+
+    if (this.player.getY() > window.innerHeight) {
+        this.resetAnim();
+    }
+
+    var x = this.startX + window.innerWidth/3 * (Math.sin(0.0006*this.elapsed) + Math.sin(0.002*this.elapsed));
+    var y = this.player.getY() + 2;
+
+    this.snowCtx.beginPath();
+    this.snowCtx.strokeStyle = "#909090";
+    this.snowCtx.lineCap = "butt";
+    this.snowCtx.moveTo(this.player.getX(), this.player.getY());
+    this.snowCtx.lineTo(x, y);
+    this.snowCtx.stroke();
+
+    this.snowCtx.beginPath();
+    this.snowCtx.strokeStyle = "#e0e0e0";
+    this.snowCtx.lineCap = "round";
+    this.snowCtx.moveTo(this.player.getX()+2, this.player.getY());
+    this.snowCtx.lineTo(x+2, y);
+    this.snowCtx.stroke();
+
+    this.player.setScaleX(x > this.player.getX() ? 1 : -1);
+
+    this.player.setXY(x, y);
+}
+
 });
+

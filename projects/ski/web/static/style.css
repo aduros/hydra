@@ -13,10 +13,8 @@
 html, body {
     width: 100%;
     height: 100%;
-    background-color: black;
     font-weight: bold;
     font-family: helvetica, sans-serif;
-    color: white;
     margin: 0;
     -webkit-box-align: center;
     -moz-box-align: center;
@@ -30,9 +28,11 @@ html, body {
 }
 
 #hydra-stage {
-    width: 320px;
-    height: 416px;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    /** TODO: Only apply this in portrait mode */
+    min-height: 416px;
+    /*overflow: hidden;*/
     position: relative;
 }
 
@@ -49,13 +49,25 @@ html, body {
     cursor: pointer;
 }
 
+.button-down {
+    margin-top: 2px;
+}
+
+.scene {
+    width: 100%;
+    height: 100%;
+}
+
 /**
  * Game specific styles
  */
 
+@font-face {
+    font-family: segao;
+    src: url(segao.ttf);
+}
+
 .scene-playing {
-    width: 100%;
-    height: 100%;
     background-color: white;
 }
 
@@ -63,7 +75,7 @@ html, body {
     width: 64px;
     height: 64px;
     background-image: url(tree.png);
-    top: -55px;
+    top: -58px;
     left: -32px;
 }
 
@@ -94,18 +106,222 @@ html, body {
 
 .player {
     width: 48px;
-    height: 54px;
+    height: 60px;
     left: -24px;
     top: -44px;
     background-image: url(player.png);
 }
 
+.scene-splash {
+    background: black;
+}
+
+.combo {
+    font-family: segao;
+    z-index: 1000;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+}
+
+/*.sign {*/
+/*    position: relative;*/
+/*}*/
+
+/*.sign-body {*/
+/*    background-color: #964b00;*/
+/*    color: white;*/
+/*    padding: 8px;*/
+/*    border: 1px solid black;*/
+/*    position: relative;*/
+/*}*/
+
+/*.sign-legs {*/
+/*    width: 100%;*/
+/*    position: relative;*/
+/*}*/
+
+/*.sign-leg-left {*/
+/*    background-color: #964b00;*/
+/*    width: 20px;*/
+/*    height: 20px;*/
+/*    position: relative;*/
+/*    bottom: 0;*/
+/*    left: 0;*/
+/*}*/
+/*.sign-leg-right {*/
+/*    background-color: #964b00;*/
+/*    width: 20px;*/
+/*    height: 20px;*/
+/*    position: relative;*/
+/*    bottom: 0;*/
+/*    right: 0;*/
+/*}*/
+
+.candy {
+    width: 34px;
+    height: 34px;
+    left: -17px;
+    top: -17px;
+    background-image: url(candy.png);
+}
+
 .life {
+    height: 16px;
+    background-image: url(heart.png);
+    z-index: 1000;
+    left: 8px;
+    top: 8px;
+}
+
+.pause-button {
+    width: 32px;
     height: 32px;
     background-image: url(pause.png);
+    z-index: 1000;
+    top: 0;
+    right: 0;
+}
+
+.mute-button {
+    background-image: url(volume-max.png);
+    width: 32px;
+    height: 32px;
+    top: 0;
+    right: 36px;
+    z-index: 1000;
+}
+
+.mute-button.button-down {
+    background-image: url(volume-mute.png);
+}
+
+
+.speed {
+    font-family: segao;
+    /*font-size: 18pt;*/
+    z-index: 1000;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+}
+
+.score {
+    font-family: segao;
+    /*font-size: 18pt;*/
+    left: 64px;
+    top: 8px;
+    z-index: 1000;
 }
 
 .sign {
-    background-color: #ffcc00;
-    border: 2px solid black;
+    color: white;
+    border-width: 12px 16px 21px;
+    -moz-border-image: url(sign.png) 12 16 21 stretch;
+    -webkit-border-image: url(sign.png) 12 16 21 stretch;
+    border-image: url(sign.png) 12 16 21 stretch;
+}
+
+.paused {
+    font-family: segao;
+    font-size: 18pt;
+    top: 50%;
+    width: 100%;
+    color: red;
+    text-align: center;
+}
+
+.menu {
+    width: 100%;
+    text-align: center;
+}
+
+.menu * {
+    position: static;
+}
+
+.main.menu {
+    top: 0;
+}
+.gameover.menu {
+    top: 40%;
+}
+
+.gameover-title {
+    font-family: segao;
+    font-size: 18pt;
+}
+
+.gameover-body {
+  text-shadow: white 0 0 3px;
+  background-color: rgba(0,0,0,0.1);
+  color: #bf1700;
+}
+
+/** From https://github.com/ubuwaits/css3-buttons */
+.action-button {
+  margin: 10px auto;
+
+  background: #c63929;
+  background: -moz-linear-gradient(0% 100% 90deg, #891100 0%, #B51700 50%, #c63929 50%, #EE432E 100%);
+  background: -webkit-gradient(linear, 0 0, 0 100%, color-stop(0, #ee432e), color-stop(0.5, #c63929), color-stop(0.5, #b51700), color-stop(1, #891100));
+  border: 1px solid #951100;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4), 0 1px 3px #333;
+  -moz-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4), 0 1px 3px #333;
+  -webkit-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4), 0 1px 3px #333;
+  color: #fff;
+  font-family: "helvetica neue", helvetica, arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  line-height: 1;
+  padding: 12px 0 14px 0;
+  text-align: center;
+  text-shadow: 0px -1px 1px rgba(0, 0, 0, .8);
+  width: 150px;
+}
+
+.action-button:hover {
+  background: #cb0500;
+  background: -moz-linear-gradient(0% 100% 90deg, #a20601 0%, #cb0500 50%, #db504d 50%, #f37873 100%);
+  background: -webkit-gradient(linear, 0 0, 0 100%, color-stop(0, #f37873), color-stop(0.5, #db504d), color-stop(0.5, #cb0500), color-stop(1, #a20601));
+}
+
+.action-button.button-down {
+  background: #b30300;
+  background: -moz-linear-gradient(0% 100% 90deg, #700d00 0%, #9c1500 50%, #ad3224 50%, #d43c28 100%);
+  background: -webkit-gradient(linear, 0 0, 0 100%, color-stop(0, #d43c28), color-stop(0.5, #ad3224), color-stop(0.5, #9c1500), color-stop(1, #700d00));
+  box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
+  -moz-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
+  -webkit-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
+}
+
+.avalanche {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    -webkit-box-shadow: white 0 0 100px 40px;
+    -moz-box-shadow: white 0 0 100px 40px;
+    -ms-box-shadow: white 0 0 100px 40px;
+    -o-box-shadow: white 0 0 100px 40px;
+    -box-shadow: white 0 0 100px 40px;
+}
+
+.credit {
+    right: 16px;
+    bottom: 0;
+    line-height: 32px;
+    color: gray;
+}
+
+.logo {
+    width: 320px;
+    height: 200px;
+    background-image: url("logo.png");
+    border: 1px solid #eee;
+    margin: 0 auto 50px auto;
 }
