@@ -176,5 +176,8 @@ hydra.dom.div = function (className) {
 hydra.dom.renderDiv = function (html) {
     var div = document.createElement("div");
     div.innerHTML = html;
+    if (div.childElementCount == 1) {
+        div = div.firstElementChild;
+    }
     return div;
 }

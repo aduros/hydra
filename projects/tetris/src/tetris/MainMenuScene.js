@@ -60,7 +60,7 @@ tetris.MainMenuScene.prototype.load = function () {
 tetris.MainMenuScene.prototype.createMainSprite = function (animate) {
     var mainSprite = new hydra.Group(hydra.dom.renderDiv(tetris.soy.mainMenu()));
     this.addEntity(mainSprite);
-    var height = mainSprite.element.firstElementChild.offsetHeight;
+    var height = mainSprite.element.offsetHeight;
 
     if (animate || this.animate) {
         mainSprite.setY(-height);
@@ -122,7 +122,7 @@ tetris.MainMenuScene.prototype.createScoreSprite = function () {
     var scoreSprite = new hydra.Group(hydra.dom.renderDiv(
         tetris.soy.scoreMenu({scores: scores})));
     this.addEntity(scoreSprite);
-    var height = scoreSprite.element.firstElementChild.offsetHeight;
+    var height = scoreSprite.element.offsetHeight;
 
     var back = new hydra.Button(scoreSprite.element.querySelector(".button-back"));
     back.onTap = function () {
