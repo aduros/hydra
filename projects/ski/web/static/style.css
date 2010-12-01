@@ -30,9 +30,8 @@ html, body {
 #hydra-stage {
     width: 100%;
     height: 100%;
-    /** TODO: Only apply this in portrait mode */
     min-height: 416px;
-    /*overflow: hidden;*/
+    overflow: hidden;
     position: relative;
 }
 
@@ -308,7 +307,7 @@ html, body {
     -moz-box-shadow: white 0 0 100px 40px;
     -ms-box-shadow: white 0 0 100px 40px;
     -o-box-shadow: white 0 0 100px 40px;
-    -box-shadow: white 0 0 100px 40px;
+    box-shadow: white 0 0 100px 40px;
 }
 
 .credit {

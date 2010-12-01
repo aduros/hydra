@@ -38,7 +38,7 @@ var PlayerState = ski.PlayerState;
 
 ski.TRAIL_RADIUS = 4;
 
-ski.MAX_LIFE = 1;
+ski.MAX_LIFE = 3;
 
 ski.account = hydra.storage.get("ski") || {};
 ski.saveAccount = function () {
@@ -84,8 +84,8 @@ ski.PlayingScene = function () {
             } else if (r < 0.02+0.1) {
                 hazard = new ski.Ramp();
             } else if (r < 0.02+0.1+0.1) {
-                hazard = new ski.Flag(this.left);
-                this.left = !this.left;
+                hazard = new ski.Flag(self.left);
+                self.left = !self.left;
             } else {
                 hazard = new ski.Tree();
             }
