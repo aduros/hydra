@@ -11,7 +11,7 @@ hydra.Transition = function (nextScene) {
     goog.base(this, "transition");
 
     /**
-     * @private
+     * @protected
      * @type {hydra.Scene}
      */
     this.nextScene = nextScene;
