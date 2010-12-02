@@ -33,8 +33,30 @@ hydra.task.CallFunction.prototype.update = function (dt, entity) {
  * @implements {hydra.Task}
  */
 hydra.task.Delay = function (delay) {
+    /**
+     * @type {number}
+     */
     this.delay = 1000*delay;
+
+    /**
+     * @private
+     * @type {number}
+     */
     this.elapsed = 0;
+}
+
+/**
+ * @inline
+ */
+hydra.task.Delay.prototype.setDelay = function (delay) {
+    this.delay = 1000*delay;
+}
+
+/**
+ * @inline
+ */
+hydra.task.Delay.prototype.getDelay = function () {
+    return this.delay / 1000;
 }
 
 hydra.task.Delay.prototype.start = function (entity) { }
