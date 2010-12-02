@@ -22,7 +22,6 @@ hydra.simulator.identifier = 0;
  */
 hydra.simulator.handleMouse = function (e) {
     e.preventDefault();
-    e.stopPropagation();
 
     var touchType = "";
     switch (e.type) {
