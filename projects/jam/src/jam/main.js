@@ -1,4 +1,4 @@
-goog.provide("jam.main");
+goog.provide("jam");
 
 goog.require("hydra.dom");
 goog.require("hydra.director");

@@ -68,7 +68,7 @@ def compile_app (target)
         "hydra.platform.COMPILED_TARGET" => String(TARGET_NAMES.index(target)),
         "hydra.APP_NAME" => "'" + String(APP_NAME) + "'", # String defines must be in single quotes, FFS.
     }
-    run_compiler(defines, ENTRY_POINT, "build/deploy/static/app-" + target + ".js");
+    run_compiler(defines, APP_NAME, "build/deploy/static/app-" + target + ".js");
 end
 
 task :js do

@@ -1,4 +1,4 @@
-goog.provide("main");
+goog.provide("ski");
 
 goog.require("hydra.dom");
 goog.require("hydra.director");

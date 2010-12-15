@@ -1,4 +1,4 @@
-goog.provide("tetris.main");
+goog.provide("tetris");
 
 goog.require("hydra.director");
 goog.require("hydra.dom");

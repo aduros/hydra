@@ -1,7 +1,6 @@
 import "../../hydra.rake"
 
 APP_NAME = "tetris"
-ENTRY_POINT = "tetris.main"
 DEBUG = false
 DEFAULT_TARGET = "webkit"
 
