@@ -25,10 +25,12 @@ goog.provide("hydra.task.BasicRotateTo");
 goog.provide("hydra.task.BasicRotateBy");
 
 goog.provide("hydra.task.Flicker");
+goog.provide("hydra.task.Shake");
 
 goog.require("hydra.dom");
 goog.require("hydra.interpolators");
 goog.require("hydra.array");
+goog.require("hydra.math");
 //goog.require("hydra.Entity");
 goog.require("hydra.dom");
 goog.require("hydra.platform");
@@ -1431,10 +1433,11 @@ if (hydra.platform.HAS_CSS_TRANSITIONS) {
 
 /**
  * @constructor
+ * @param {number} duration
  * @implements {hydra.Task}
  */
-hydra.task.Flicker = function (delay) {
-    this.delay = 1000*delay;
+hydra.task.Flicker = function (duration) {
+    this.duration = 1000*duration;
     this.elapsed = 0;
     this.phase = false;
 }
@@ -1443,9 +1446,12 @@ hydra.task.Flicker.prototype.start = function (entity) { }
 
 hydra.task.Flicker.prototype.stop = function (entity) { }
 
+/**
+ * @param {hydra.Sprite} sprite
+ */
 hydra.task.Flicker.prototype.update = function (dt, sprite) {
     this.elapsed += dt;
-    if (this.elapsed >= this.delay) {
+    if (this.elapsed >= this.duration) {
         this.elapsed = 0;
         this.phase = false;
         sprite.element.style.visibility = "";
@@ -1453,6 +1459,45 @@ hydra.task.Flicker.prototype.update = function (dt, sprite) {
     } else {
         sprite.element.style.visibility = this.phase ? "" : "hidden";
         this.phase = !this.phase;
+        return false;
+    }
+}
+
+/**
+ * @constructor
+ * @param {number} radius
+ * @param {number} duration
+ * @implements {hydra.Task}
+ */
+hydra.task.Shake = function (radius, duration) {
+    this.radius = radius;
+    this.duration = 1000*duration;
+    this.elapsed = 0;
+}
+
+/**
+ * @param {hydra.Sprite} sprite
+ */
+hydra.task.Shake.prototype.start = function (sprite) {
+    this.fromX = sprite.getX();
+    this.fromY = sprite.getY();
+}
+
+hydra.task.Shake.prototype.stop = function (entity) { }
+
+/**
+ * @param {hydra.Sprite} sprite
+ */
+hydra.task.Shake.prototype.update = function (dt, sprite) {
+    this.elapsed += dt;
+    if (this.elapsed >= this.duration) {
+        this.elapsed = 0;
+        sprite.setXY(this.fromX, this.fromY);
+        return true;
+    } else {
+        sprite.setXY(
+            this.fromX + 2*hydra.math.random()*this.radius-this.radius,
+            this.fromY + 2*hydra.math.random()*this.radius-this.radius);
         return false;
     }
 }
