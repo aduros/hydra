@@ -31,6 +31,7 @@ if (!hydra.simulator.supportsTouch) {
 goog.require("tetris.PlayingScene");
 goog.require("tetris.OrientationScene");
 
+hydra.storage.loadAccount();
 hydra.director.init(new tetris.MainMenuScene(false));
 
 // Fade in
@@ -57,12 +58,12 @@ onOrientationChanged();
 function hideSafari () {
     window.setTimeout(window.scrollTo, 0, 1, 0); // 1 px is intentional
 }
-window.addEventListener("load", hideSafari, false);
 window.addEventListener("resize", hideSafari, false);
 document.addEventListener("touchstart", function (event) {
     event.preventDefault();
     window.scrollTo(0, 1);
 }, true);
+window.scrollTo(0, 1);
 
 // Allows keyboard events when embedded in an iframe
 if (window.top != window) {

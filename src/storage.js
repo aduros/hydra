@@ -44,6 +44,19 @@ hydra.storage.toNamespace = function (key) {
     return "hydra:" + key;
 }
 
+/**
+ * @type {!Object}
+ */
+hydra.account;
+
+hydra.storage.loadAccount = function () {
+    hydra.account = hydra.storage.get(hydra.APP_NAME) || {};
+}
+
+hydra.storage.saveAccount = function () {
+    hydra.storage.set(hydra.APP_NAME, hydra.account);
+}
+
 //hydra.storage.clear = function () {
 //    localStorage.clear();
 //}

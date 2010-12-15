@@ -95,9 +95,9 @@ jam.MainMenuScene.prototype.load = function () {
 
 //jam.MainMenuScene.prototype.createScoreSprite = function () {
 //    var scores;
-//    if ("scores" in jam.ctx.account) {
+//    if ("scores" in hydra.account) {
 //        var now = Date.now();
-//        scores = jam.ctx.account["scores"].map(function (x) {
+//        scores = hydra.account["scores"].map(function (x) {
 //            return {
 //                score: x["score"],
 //                date: hydra.string.fromDate(x["date"], now)

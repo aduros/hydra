@@ -1,7 +1,8 @@
 import "../../hydra.rake"
 
+APP_NAME = "tetris"
 ENTRY_POINT = "tetris.main"
-DEBUG = true
-DEFAULT_TARGET = "ff3"
+DEBUG = false
+DEFAULT_TARGET = "webkit"
 
 task :default => :deploy

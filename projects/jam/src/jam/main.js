@@ -36,10 +36,11 @@ goog.require("jam.PlayingScene");
 goog.require("jam.MainMenuScene");
 goog.require("jam.OrientationScene");
 
+hydra.storage.loadAccount();
 hydra.director.init(new jam.MainMenuScene());
 
 jam.ctx.music = hydra.sound.play("static/music.mp3");
-if (jam.ctx.account["mute"]) {
+if (hydra.account["mute"]) {
     jam.ctx.music.pause();
 }
 // Loop property doesn't work on iOS
@@ -69,12 +70,13 @@ onOrientationChanged();
 function hideSafari () {
     window.setTimeout(window.scrollTo, 0, 1, 0); // 1 px is intentional
 }
-window.addEventListener("load", hideSafari, false); // TODO: Can be DOMContentloaded?
+//window.addEventListener("load", hideSafari, false); // TODO: Can be DOMContentloaded?
 window.addEventListener("resize", hideSafari, false);
 document.addEventListener("touchstart", function (event) {
     event.preventDefault();
     window.scrollTo(0, 1);
 }, true);
+window.scrollTo(0, 1);
 
 // App caching
 if ("applicationCache" in window) {

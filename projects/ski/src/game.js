@@ -40,11 +40,6 @@ ski.TRAIL_RADIUS = 4;
 
 ski.MAX_LIFE = 3;
 
-ski.account = hydra.storage.get("ski") || {};
-ski.saveAccount = function () {
-    hydra.storage.set("ski", ski.account);
-}
-
 /**
  * @constructor
  * @extends {Scene}
@@ -132,11 +127,11 @@ ski.PlayingScene = function () {
     muteButton.onTap = function () {
         var oldValue = muteButton.isToggled();
         music.setEnabled(oldValue);
-        ski.account["mute"] = !oldValue;
-        ski.saveAccount();
+        hydra.account["mute"] = !oldValue;
+        hydra.storage.saveAccount();
         muteButton.setToggled(!oldValue);
     }
-    muteButton.setToggled(ski.account["mute"]);
+    muteButton.setToggled(hydra.account["mute"]);
     this.addEntity(muteButton);
 
     this.setLevel(1);
@@ -304,7 +299,7 @@ ski.PlayingScene.prototype.setLife = function (life) {
         this.player.removeAllTasks();
         this.removeAllTasks();
 
-        ski.account["bestScore"] = hydra.math.max(this.score, hydra.math.toInt(ski.account["bestScore"]));
+        hydra.account["bestScore"] = hydra.math.max(this.score, hydra.math.toInt(hydra.account["bestScore"]));
 
         this.playerChassis.addTask(new hydra.task.Sequence([
             hydra.task.MoveTo.easeOut(this.playerChassis.getX(), 0.5*window.innerHeight, 0.5*this.delay),
@@ -315,7 +310,7 @@ ski.PlayingScene.prototype.setLife = function (life) {
                 // I'll find a more light weight template compiler at some point... or roll my own.
                 var menuDiv = hydra.dom.renderDiv("<div class='gameover menu'>" +
                     "<div class='gameover-title'>Game Over</div>" +
-                    "<div class='gameover-body'>Your personal best score is " + ski.account["bestScore"] + "</div>" +
+                    "<div class='gameover-body'>Your personal best score is " + hydra.account["bestScore"] + "</div>" +
                     "<div class='action-button'>Replay</div>" +
                     "<div class='action-button'>Menu</div>" +
                 "</div>");

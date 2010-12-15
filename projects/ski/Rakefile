@@ -1,5 +1,6 @@
 import "../../hydra.rake"
 
+APP_NAME = "ski"
 ENTRY_POINT = "main"
 DEBUG = false
 DEFAULT_TARGET = "webkit"

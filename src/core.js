@@ -11,6 +11,11 @@ goog.require("hydra.ListenerManager");
 goog.require("hydra.platform");
 
 /**
+ * @define {string} Unique identifier for this game.
+ */
+hydra.APP_NAME = "mygame";
+
+/**
  * @private
  * @type {hydra.Scene}
  */

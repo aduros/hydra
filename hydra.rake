@@ -54,7 +54,7 @@ def run_compiler (defines, entry_point, output_file)
         " " + LIBS.map {|path| "'--root=" + path + "'" }.join(" ") + 
         " -o compiled -c '" + HYDRA_HOME + "/tools/compiler.jar'" +
         " " + options.map {|key, value| "-f '--" + key + "=" + value + "'" }.join(" ") +
-        " " + defines.map {|key, value| "-f --define=" + key + "=" + value}.join(" ") +
+        " " + defines.map {|key, value| "-f \"--define=" + key + "=" + value + "\""}.join(" ") +
         " " + errors.map {|error| "-f --jscomp_error=" + error}.join(" ") +
         " " + warnings.map {|warning| "-f --jscomp_warning=" + warning}.join(" ") +
         " " + EXTERNS.map {|dir| FileList.new(dir+"/**/*.js").map {|file| "-f --externs=" + file}.join(" ")}.join(" ") +
@@ -66,6 +66,7 @@ def compile_app (target)
     puts("Compiling JS for '" + target + "'...");
     defines = {
         "hydra.platform.COMPILED_TARGET" => String(TARGET_NAMES.index(target)),
+        "hydra.APP_NAME" => "'" + String(APP_NAME) + "'", # String defines must be in single quotes, FFS.
     }
     run_compiler(defines, ENTRY_POINT, "build/deploy/static/app-" + target + ".js");
 end

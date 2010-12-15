@@ -48,11 +48,11 @@ jam.PlayingScene.prototype.load = function () {
         } else {
             jam.ctx.music.pause();
         }
-        jam.ctx.account["mute"] = !oldValue;
-        jam.ctx.saveAccount();
+        hydra.account["mute"] = !oldValue;
+        hydra.storage.saveAccount();
         muteButton.setToggled(!oldValue);
     }
-    muteButton.setToggled(jam.ctx.account["mute"]);
+    muteButton.setToggled(hydra.account["mute"]);
     muteButton.setXY(320-40-8, 10);
     this.addEntity(muteButton);
 
@@ -162,11 +162,11 @@ jam.PlayingScene.prototype.updateClock = function () {
 }
 
 jam.PlayingScene.prototype.onGameOver = function () {
-    var best = jam.ctx.account["best"] || 0;
+    var best = hydra.account["best"] || 0;
     if (jam.ctx.board.score > best) {
         best = jam.ctx.board.score;
-        jam.ctx.account["best"] = best;
-        jam.ctx.saveAccount();
+        hydra.account["best"] = best;
+        hydra.storage.saveAccount();
     }
     hydra.director.replaceScene(
         confirm("Game over! You scored " + jam.ctx.board.score + " points." +

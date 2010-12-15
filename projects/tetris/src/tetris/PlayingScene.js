@@ -50,7 +50,7 @@ tetris.PlayingScene.prototype.load = function () {
     };
     this.addEntity(pauseButton, null);
 
-//    var shouldMute = tetris.ctx.account["mute"];
+//    var shouldMute = hydra.account["mute"];
 //    tetris.ctx.music = new hydra.Music("static/music.mp3");
 //    tetris.ctx.music.setEnabled(!shouldMute);
 //    this.addEntity(tetris.ctx.music);
@@ -59,8 +59,8 @@ tetris.PlayingScene.prototype.load = function () {
 //    volumeButton.onTap = function () {
 //        var oldValue = volumeButton.isToggled();
 //        tetris.ctx.music.setEnabled(oldValue);
-//        tetris.ctx.account["mute"] = !oldValue;
-//        tetris.ctx.saveAccount();
+//        hydra.account["mute"] = !oldValue;
+//        hydra.storage.saveAccount();
 //        volumeButton.setToggled(!oldValue);
 //    };
 //    volumeButton.setToggled(shouldMute);
@@ -72,7 +72,7 @@ tetris.PlayingScene.prototype.load = function () {
     this.marquee = new tetris.Marquee();
     this.marquee.setY(40);
 
-    if (!("lastGame" in tetris.ctx.account)) {
+    if (!("lastGame" in hydra.account)) {
         this.marquee.setText(hydra.simulator.supportsTouch ?
             tetris.soy.introTouch() : tetris.soy.introKeyboard());
     }

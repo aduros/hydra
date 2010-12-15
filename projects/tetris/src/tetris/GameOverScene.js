@@ -18,11 +18,11 @@ tetris.GameOverScene.prototype.load = function () {
 
 //    hydra.analytics.trackEvent("gameplay", "finishGame", tetris.ctx.board.score);
 
-    tetris.ctx.account["lastGame"] = Date.now();
+    hydra.account["lastGame"] = Date.now();
 
-    var scores = tetris.ctx.account["scores"];
+    var scores = hydra.account["scores"];
     if (!scores) {
-        tetris.ctx.account["scores"] = scores = [];
+        hydra.account["scores"] = scores = [];
     }
     for (var rank = 0; rank < scores.length; ++rank) {
         var scoreRecord = scores[rank];
@@ -34,7 +34,7 @@ tetris.GameOverScene.prototype.load = function () {
     if (scores.length > 10) {
         scores.length = 10;
     }
-    tetris.ctx.saveAccount();
+    hydra.storage.saveAccount();
 
     var ui = hydra.dom.renderDiv(tetris.soy.sceneGameOver({
         score: tetris.ctx.board.score,

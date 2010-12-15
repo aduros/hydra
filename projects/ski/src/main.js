@@ -28,6 +28,7 @@ var MainMenuScene = ski.MainMenuScene;
 
 (function () {
     setTimeout(function () { // Wait until safari has been unfucked
+        hydra.storage.loadAccount();
         if (!hydra.simulator.supportsTouch) {
             hydra.simulator.init();
         }
