@@ -1,7 +1,6 @@
 goog.provide("hydra.Transition");
 goog.provide("hydra.SlideTransition");
-
-// TODO: Slide, fade, zoom scene transitions, etc, etc
+goog.provide("hydra.FadeTransition");
 
 /**
  * @constructor
@@ -15,8 +14,6 @@ hydra.Transition = function (nextScene) {
      * @type {hydra.Scene}
      */
     this.nextScene = nextScene;
-
-//    this.addUpdatable(toScene);
 }
 goog.inherits(hydra.Transition, hydra.Scene);
 
@@ -52,6 +49,32 @@ hydra.SlideTransition.prototype.load = function () {
             hydra.task.MoveTo.linear(-320, 0, this.duration, hydra.director.getPreviousScene().getRoot()),
             hydra.task.MoveTo.linear(0, 0, this.duration, this.nextScene.getRoot())
         ]),
+        new hydra.task.CallFunction(function () {
+            self.complete();
+        })
+    ]));
+}
+
+/**
+ * @constructor
+ * @extends {hydra.Transition}
+ * @param {hydra.Scene} nextScene
+ * @param {number} duration
+ */
+hydra.FadeTransition = function (nextScene, duration) {
+    goog.base(this, nextScene);
+
+    this.duration = duration;
+}
+goog.inherits(hydra.FadeTransition, hydra.Transition);
+
+hydra.FadeTransition.prototype.load = function () {
+    goog.base(this, "load");
+
+    var self = this;
+    this.nextScene.getRoot().setCss("opacity", "0");
+    this.addTask(new hydra.task.Sequence([
+        hydra.task.StyleTo.linear("opacity", "1", this.duration, this.nextScene.getRoot()),
         new hydra.task.CallFunction(function () {
             self.complete();
         })
