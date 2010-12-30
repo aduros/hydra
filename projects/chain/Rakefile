@@ -1,0 +1,7 @@
+import "../../hydra.rake"
+
+APP_NAME = "chain"
+DEBUG = true
+DEFAULT_TARGET = "webkit"
+
+task :default => :deploy

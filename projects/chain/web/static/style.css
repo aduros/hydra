@@ -1,0 +1,130 @@
+/**
+ * Standard Hydra styles
+ */
+
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+    position: absolute;
+    cursor: default;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-weight: bold;
+    font-family: helvetica, sans-serif;
+    margin: 0;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    box-align: center;
+    -webkit-box-pack: center;
+    -moz-box-pack: center;
+    box-pack: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+}
+
+#hydra-stage {
+    /*width: 100%;*/
+    /*height: 100%;*/
+    min-height: 416px;
+    min-width: 320px;
+    overflow: hidden;
+    position: relative;
+}
+
+#hydra-fps {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    color: white;
+    text-shadow: black 0px 0px 3px;
+}
+
+.button {
+    cursor: pointer;
+}
+
+.button-down {
+    margin-top: 2px;
+}
+
+.scene {
+    width: 100%;
+    height: 100%;
+}
+
+/**
+ * Game specific styles
+ */
+
+.robot {
+    width: 24px;
+    height: 32px;
+    left: -12px;
+    top: -16px;
+    background-image: url(robot.png);
+}
+
+.shockwave {
+    width: 96px;
+    height: 96px;
+    left: -48px;
+    top: -48px;
+    border-radius: 100px 100px;
+    border: 4px solid #fbeb59;
+}
+
+.fireball {
+    width: 80px;
+    height: 80px;
+    top: -40px;
+    left: -40px;
+    background-image: url(fireball.png);
+}
+
+.status {
+}
+
+.crater {
+    width: 80px;
+    height: 80px;
+    background-image: url(crater.png);
+    left: -40px;
+    top: -40px;
+    opacity: 0.2;
+}
+
+.scene-playing {
+    background: green;
+}
+
+.scene-continue {
+    background: black;
+    color: white;
+}
+
+.summary.win {
+    color: green;
+}
+
+.summary.loss {
+    color: red;
+}
+
+.menu {
+    width: 100%;
+    text-align: center;
+}
+
+.menu * {
+    position: static;
+}
+
+.continue.menu {
+    top: 30%;
+}
