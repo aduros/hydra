@@ -23,9 +23,11 @@ goog.require("hydra.sound");
 goog.require("hydra.api.playtomic");
 
 goog.require("chain.PlayingScene");
+goog.require("chain.MainMenuScene");
 
 goog.scope(function () {
 var PlayingScene = chain.PlayingScene;
+var MainMenuScene = chain.MainMenuScene;
 
 (function () {
     if (!goog.DEBUG) {
@@ -43,7 +45,8 @@ var PlayingScene = chain.PlayingScene;
     if (!hydra.simulator.supportsTouch) {
         hydra.simulator.init();
     }
-    hydra.director.init(new PlayingScene(5, 10));
+    chain.resetGame();
+    hydra.director.init(new MainMenuScene());
 
     // Safari hacks
     // Looks like android requires it too

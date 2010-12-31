@@ -1,8 +1,9 @@
 goog.provide("chain.PlayingScene");
-//goog.provide("chain.MainMenuScene");
+goog.provide("chain.MainMenuScene");
 
 goog.require("hydra.task.Shake");
 goog.require("hydra.FadeTransition");
+goog.require("hydra.SlideTransition");
 
 goog.scope(function () {
 var Scene = hydra.Scene;
@@ -26,12 +27,42 @@ chain.ROBOT_RADIUS = 12;
 chain.ROBOT_SPEED = 50; // px/s
 
 /**
+ * @const
+ */
+chain.SCORE_PER_ROBOT = 25;
+
+/**
+ * @type {number}
+ */
+chain.level;
+
+/**
+ * @type {number}
+ */
+chain.score;
+
+chain.resetGame = function () {
+    chain.level = 1;
+    chain.score = 0;
+}
+
+chain.getMinimumBots = function (level) {
+    return level;
+}
+
+chain.getTotalBots = function (level) {
+    return Math.round(5 * Math.pow(level, 0.5));
+}
+
+chain.getLevelBonus = function (level) {
+    return level * chain.SCORE_PER_ROBOT * 3;
+}
+
+/**
  * @constructor
  * @extends {Scene}
- * @param {number} targetScore
- * @param {number} totalBots
  */
-chain.PlayingScene = function (targetScore, totalBots) {
+chain.PlayingScene = function () {
     goog.base(this, "playing");
 
     /**
@@ -44,8 +75,8 @@ chain.PlayingScene = function (targetScore, totalBots) {
      */
     this.shockwaves = [];
 
-    this.targetScore = targetScore;
-    this.totalBots = totalBots;
+    this.minimumBots = chain.getMinimumBots(chain.level);
+    this.totalBots = chain.getTotalBots(chain.level);
 }
 goog.inherits(chain.PlayingScene, Scene);
 
@@ -53,8 +84,12 @@ goog.inherits(chain.PlayingScene, Scene);
  * @override
  */
 chain.PlayingScene.prototype.load = function () {
-    this.groundLayer = new Group();
-    this.addEntity(this.groundLayer);
+    var theme = hydra.math.toInt(chain.level/3) % 3;
+    this.root.element.style.backgroundImage = "url(static/terrain" + theme + ".png)";
+
+    this.addEntity(this.groundLayer = new Group());
+    this.addEntity(this.actorLayer = new Group());
+    this.addEntity(this.uiLayer = new Group());
 
     for (var ii = 0; ii < this.totalBots; ++ii) {
         var robot = new chain.Robot();
@@ -63,20 +98,29 @@ chain.PlayingScene.prototype.load = function () {
         robot.vx = chain.ROBOT_SPEED*Math.cos(angle);
         robot.vy = chain.ROBOT_SPEED*Math.sin(angle);
 
-        this.addEntity(robot);
+        this.actorLayer.addSprite(robot);
         this.robots.push(robot);
     }
 
     this.elapsed = 0;
-    this.score = 0;
+    this.killedBots = 0;
     this.tapped = false;
 
-    this.status = Sprite.div("status");
+    this.uiLayer.addSprite(this.score = Sprite.div("score"));
+    this.uiLayer.addSprite(this.status = Sprite.div("status"));
     this.updateStatus();
-    this.addEntity(this.status);
 
     this.registerListener(this.root.element, "touchstart",
         goog.bind(chain.PlayingScene.prototype.onTouchStart, this));
+
+    var marquee = new Sprite.div("marquee");
+    marquee.element.textContent = "Stage " + chain.level;
+    marquee.setY(150);
+    marquee.addTask(new hydra.task.Sequence([
+        hydra.task.StyleTo.linear("opacity", "0", 3)
+        //new hydra.task.SelfDestruct()
+    ]));
+    this.uiLayer.addSprite(marquee);
 }
 
 chain.PlayingScene.prototype.onTouchStart = function (event) {
@@ -106,7 +150,7 @@ chain.PlayingScene.prototype.createExplosion = function (x, y) {
             }
         })
     ])));
-    this.addEntity(fireball);
+    this.actorLayer.addSprite(fireball);
 
     var shockwave = Sprite.div("shockwave");
     shockwave.setXY(x, y);
@@ -118,7 +162,7 @@ chain.PlayingScene.prototype.createExplosion = function (x, y) {
         //hydra.task.ScaleTo.linear(0, 0, 0.25),
         new hydra.task.SelfDestruct()
     ]));
-    this.addEntity(shockwave);
+    this.actorLayer.addSprite(shockwave);
     this.shockwaves.push(shockwave);
 
     var crater = Sprite.div("crater");
@@ -127,7 +171,21 @@ chain.PlayingScene.prototype.createExplosion = function (x, y) {
 }
 
 chain.PlayingScene.prototype.updateStatus = function () {
-    this.status.element.textContent = this.score + " / " + this.targetScore;
+    this.status.element.textContent =
+        this.killedBots + " / " + this.minimumBots + " of " + this.totalBots;
+    this.score.element.textContent = String(this.getScore());
+
+    if (this.killedBots == this.minimumBots) {
+        hydra.dom.addClass(this.status.element, "win");
+        this.status.addTask(new hydra.task.Sequence([
+            hydra.task.ScaleTo.easeIn(1.2, 1.2, 0.25),
+            hydra.task.ScaleTo.easeOut(1, 1, 0.25)
+        ]));
+    }
+}
+
+chain.PlayingScene.prototype.getScore = function () {
+    return chain.score + this.killedBots * 25;
 }
 
 /**
@@ -164,7 +222,7 @@ chain.PlayingScene.prototype.update = function (dt) {
                     this.robots.splice(ii--, 1);
                     this.createExplosion(robot.getX(), robot.getY());
 
-                    ++this.score;
+                    ++this.killedBots;
                     this.updateStatus();
 
                     continue robotLoop;
@@ -199,8 +257,14 @@ chain.PlayingScene.prototype.update = function (dt) {
     }
 
     if (this.tapped && (this.robots.length == 0 || this.shockwaves.length == 0)) {
-        var win = this.score >= this.targetScore;
-        hydra.director.pushScene(new hydra.FadeTransition(new chain.ContinueScene(win), 1));
+        var win = this.killedBots >= this.minimumBots;
+        if (win) {
+            chain.score = this.getScore() + chain.getLevelBonus(chain.level);
+        }
+        hydra.account["bestScore"] =
+            hydra.math.max(hydra.math.toInt(hydra.account["bestScore"]), chain.score);
+        hydra.storage.saveAccount();
+        hydra.director.pushScene(new hydra.FadeTransition(new chain.ContinueScene(win), 0.5));
     }
 }
 
@@ -253,15 +317,69 @@ chain.ContinueScene.prototype.load = function () {
     this.addEntity(menu);
 
     var summary = Sprite.div("summary " + (this.isWin ? "win" : "loss"));
-    summary.element.textContent = this.isWin ? "Level complete!" : "Level failed...";
+    summary.element.innerHTML = this.isWin ?
+        "Stage " + chain.level + " complete!<br>" +
+            chain.score + " pts (" + chain.getLevelBonus(chain.level) + " bonus)" :
+        "Stage failed...";
     menu.addSprite(summary);
 
     var nextButton = Button.div("action-button");
     nextButton.element.textContent = this.isWin ? "Continue" : "Retry";
     nextButton.onTap = function () {
-        hydra.director.pushScene(new hydra.FadeTransition(new chain.PlayingScene(5, 12), 1));
+        hydra.director.pushScene(new hydra.FadeTransition(new chain.PlayingScene(), 0.5));
     };
     menu.addSprite(nextButton);
+
+    var quitButton = Button.div("action-button");
+    quitButton.element.textContent = "End Game";
+    quitButton.onTap = function () {
+        hydra.director.pushScene(new hydra.SlideTransition(new chain.MainMenuScene(), 0.8));
+    };
+    menu.addSprite(quitButton);
+
+    if (this.isWin) {
+        ++chain.level;
+    }
+}
+
+/**
+ * @constructor
+ * @extends {Scene}
+ */
+chain.MainMenuScene = function () {
+    goog.base(this, "mainmenu");
+}
+goog.inherits(chain.MainMenuScene, Scene);
+
+chain.MainMenuScene.prototype.load = function () {
+    var menu = Group.div("main menu");
+    this.addEntity(menu);
+
+    var playButton = Button.div("action-button");
+    playButton.element.textContent = "Play";
+    playButton.onTap = function () {
+        hydra.director.pushScene(new hydra.SlideTransition(new chain.PlayingScene(), 0.8));
+    };
+    menu.addSprite(playButton);
+
+    var quitButton = Button.div("action-button");
+    quitButton.element.textContent = "Quit";
+    quitButton.onTap = function () {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.close();
+            window.location = "http://google.com"; // We'll get here if close() was refused
+        }
+    };
+    menu.addSprite(quitButton);
+
+    var score = hydra.account["bestScore"];
+    if (score) {
+        var bestScore = Sprite.div("bestScore");
+        bestScore.element.textContent = "High score: " + score;
+        this.addEntity(bestScore);
+    }
 }
 
 });
