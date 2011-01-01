@@ -45,7 +45,6 @@ var MainMenuScene = chain.MainMenuScene;
     if (!hydra.simulator.supportsTouch) {
         hydra.simulator.init();
     }
-    chain.resetGame();
     hydra.director.init(new MainMenuScene());
 
     // Safari hacks
@@ -53,8 +52,9 @@ var MainMenuScene = chain.MainMenuScene;
     function hideSafari () {
         window.setTimeout(function () {
             window.scrollTo(0, 1); // 1 px is intentional
-            if (window.innerHeight < 416) {
-                alert("Your screen is very small! Try going into portrait mode for a better fit.");
+            if (chain.OrientationScene.shouldWarn() &&
+                !(hydra.director.getCurrentScene() instanceof chain.OrientationScene)) {
+                hydra.director.pushScene(new chain.OrientationScene());
             }
         }, 0);
     }

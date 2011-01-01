@@ -1,5 +1,6 @@
 goog.provide("chain.PlayingScene");
 goog.provide("chain.MainMenuScene");
+goog.provide("chain.OrientationScene");
 
 goog.require("hydra.task.Shake");
 goog.require("hydra.FadeTransition");
@@ -41,13 +42,36 @@ chain.level;
  */
 chain.score;
 
+/**
+ * @type {number}
+ */
+chain.lives;
+
+/**
+ * @type {HTMLAudioElement}
+ */
+chain.music;
+
 chain.resetGame = function () {
     chain.level = 1;
     chain.score = 0;
+    chain.startRound();
+    chain.music = hydra.sound.play("static/music.mp3");
+    // HTMLAudioElement.prototype.loop does not work on iOS
+    chain.music.addEventListener("ended", HTMLAudioElement.prototype.play, false);
+}
+
+chain.startRound = function () {
+    chain.lives = 2;
+}
+
+chain.endGame = function () {
+    chain.music.pause();
+    chain.music = null;
 }
 
 chain.getMinimumBots = function (level) {
-    return level;
+    return hydra.math.min(chain.getTotalBots(level), level);
 }
 
 chain.getTotalBots = function (level) {
@@ -121,35 +145,43 @@ chain.PlayingScene.prototype.load = function () {
         //new hydra.task.SelfDestruct()
     ]));
     this.uiLayer.addSprite(marquee);
+
+    var muteButton = Button.div("mute-button");
+    muteButton.onTap = function () {
+        var oldValue = muteButton.isToggled();
+        if (oldValue) {
+            chain.music.play();
+        } else {
+            chain.music.pause();
+        }
+        hydra.account["mute"] = !oldValue;
+        hydra.storage.saveAccount();
+        muteButton.setToggled(!oldValue);
+    }
+    muteButton.setToggled(hydra.account["mute"]);
+    this.uiLayer.addSprite(muteButton);
+
+    if (!muteButton.isToggled()) {
+        chain.music.play();
+    } else {
+        chain.music.pause();
+    }
 }
 
 chain.PlayingScene.prototype.onTouchStart = function (event) {
     if (!this.tapped) {
         this.tapped = true;
         var touch = event.touches[0];
-        var local = this.root.pageToLocal(touch.pageX, touch.pageY); // FIXME
-        this.createExplosion(local.x, local.y);
+        // Assumes the stage isn't nested deep in another elements
+        var x = touch.pageX - hydra.director.getStage().offsetLeft;
+        var y = touch.pageY - hydra.director.getStage().offsetTop;
+        this.createExplosion(x, y);
     }
 }
 
 chain.PlayingScene.prototype.createExplosion = function (x, y) {
-    var frame = 0;
-    var fireball = Sprite.div("fireball");
+    var fireball = new chain.Fireball();
     fireball.setXY(x, y);
-    fireball.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
-        new hydra.task.Delay(0.05),
-        new hydra.task.CallFunction(function () {
-            if (frame == 13) {
-                fireball.destroy();
-            } else {
-                var x = frame % 7;
-                var y = hydra.math.toInt(frame / 7);
-                fireball.element.style.setProperty("background-position",
-                    (-80*x) + "px " + (-80*y) + "px");
-                ++frame;
-            }
-        })
-    ])));
     this.actorLayer.addSprite(fireball);
 
     var shockwave = Sprite.div("shockwave");
@@ -272,6 +304,31 @@ chain.PlayingScene.prototype.update = function (dt) {
  * @constructor
  * @extends {Sprite}
  */
+chain.Fireball = function () {
+    goog.base(this, hydra.dom.div("fireball"));
+    var frame = 0;
+    var self = this;
+    this.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
+        new hydra.task.Delay(0.05),
+        new hydra.task.CallFunction(function () {
+            if (frame == 13) {
+                self.destroy();
+            } else {
+                var x = frame % 7;
+                var y = hydra.math.toInt(frame / 7);
+                self.element.style.setProperty("background-position",
+                    (-80*x) + "px " + (-81*y) + "px");
+                ++frame;
+            }
+        })
+    ])));
+}
+goog.inherits(chain.Fireball, Sprite);
+
+/**
+ * @constructor
+ * @extends {Sprite}
+ */
 chain.Robot = function () {
     goog.base(this, hydra.dom.div("robot"));
     this.vx = 0;
@@ -320,25 +377,33 @@ chain.ContinueScene.prototype.load = function () {
     summary.element.innerHTML = this.isWin ?
         "Stage " + chain.level + " complete!<br>" +
             chain.score + " pts (" + chain.getLevelBonus(chain.level) + " bonus)" :
-        "Stage failed...";
+        (chain.lives > 0 ?
+            "Stage failed...<br>" + chain.lives + " tries left" :
+            "Game over<br>Final score:" + chain.score);
     menu.addSprite(summary);
 
-    var nextButton = Button.div("action-button");
-    nextButton.element.textContent = this.isWin ? "Continue" : "Retry";
-    nextButton.onTap = function () {
-        hydra.director.pushScene(new hydra.FadeTransition(new chain.PlayingScene(), 0.5));
-    };
-    menu.addSprite(nextButton);
+    if (this.isWin || chain.lives > 0) {
+        var nextButton = Button.div("action-button");
+        nextButton.element.textContent = this.isWin ? "Continue" : "Retry";
+        nextButton.onTap = function () {
+            hydra.director.pushScene(new hydra.FadeTransition(new chain.PlayingScene(), 0.5));
+        };
+        menu.addSprite(nextButton);
+    }
 
     var quitButton = Button.div("action-button");
     quitButton.element.textContent = "End Game";
     quitButton.onTap = function () {
+        chain.endGame();
         hydra.director.pushScene(new hydra.SlideTransition(new chain.MainMenuScene(), 0.8));
     };
     menu.addSprite(quitButton);
 
     if (this.isWin) {
         ++chain.level;
+        chain.startRound();
+    } else {
+        --chain.lives;
     }
 }
 
@@ -352,12 +417,34 @@ chain.MainMenuScene = function () {
 goog.inherits(chain.MainMenuScene, Scene);
 
 chain.MainMenuScene.prototype.load = function () {
+    var explosionLayer = new Group();
+    this.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
+        new hydra.task.Delay(0.2),
+        new hydra.task.CallFunction(function () {
+            var fireball = new chain.Fireball();
+            fireball.setXY(hydra.math.random() * 320,
+                hydra.math.random() * 416);
+            explosionLayer.addSprite(fireball);
+        })
+    ])));
+    this.addEntity(explosionLayer);
+
+    this.addEntity(Sprite.div("logo"));
+
     var menu = Group.div("main menu");
     this.addEntity(menu);
+
+    var score = hydra.account["bestScore"];
+    var info = Sprite.div("info");
+    info.element.textContent = score ?
+        "High score: " + score :
+        "Tap once to create a chain reaction!";
+    menu.addSprite(info);
 
     var playButton = Button.div("action-button");
     playButton.element.textContent = "Play";
     playButton.onTap = function () {
+        chain.resetGame();
         hydra.director.pushScene(new hydra.SlideTransition(new chain.PlayingScene(), 0.8));
     };
     menu.addSprite(playButton);
@@ -374,12 +461,32 @@ chain.MainMenuScene.prototype.load = function () {
     };
     menu.addSprite(quitButton);
 
-    var score = hydra.account["bestScore"];
-    if (score) {
-        var bestScore = Sprite.div("bestScore");
-        bestScore.element.textContent = "High score: " + score;
-        this.addEntity(bestScore);
-    }
+    var credit = Sprite.div("credit");
+    credit.element.textContent = "by @b_garcia";
+    this.addEntity(credit);
+}
+
+/**
+ * @constructor
+ * @extends {Scene}
+ */
+chain.OrientationScene = function () {
+    goog.base(this, "orientation");
+}
+goog.inherits(chain.OrientationScene, Scene);
+
+chain.OrientationScene.shouldWarn = function () {
+    // Not actually correct, but the easiest thing to get working with Safari's fucking sliding toolbar
+    return document.body.offsetWidth > 320 && document.body.offsetHeight < 416;
+}
+
+chain.OrientationScene.prototype.load = function () {
+    this.addEntity(new Sprite(hydra.dom.renderDiv("Rotate your device to play!")));
+    this.registerListener(window, "orientationchange", function () {
+        if (!chain.OrientationScene.shouldWarn()) {
+            hydra.director.popScene();
+        }
+    });
 }
 
 });

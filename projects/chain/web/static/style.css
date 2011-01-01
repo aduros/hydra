@@ -89,9 +89,9 @@ html, body {
 
 .fireball {
     width: 80px;
-    height: 80px;
-    top: -40px;
+    height: 81px;
     left: -40px;
+    top: -40.5px;
     background-image: url(fireball.png);
 }
 
@@ -130,6 +130,10 @@ html, body {
     color: white;
 }
 
+.scene-mainmenu {
+    background-color: white;
+}
+
 .summary {
     font-family: joystix;
     padding-bottom: 16px;
@@ -157,7 +161,7 @@ html, body {
 }
 
 .main.menu {
-    top: 60%;
+    top: 50%;
 }
 
 .action-button {
@@ -214,7 +218,38 @@ html, body {
     text-align: center;
 }
 
-.bestScore {
-    right: 0;
+.scene-orientation {
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    color: white;
+}
+
+.scene-orientation :first-child {
+    position: static;
+    margin-top: 100px;
+}
+
+.credit {
+    right: 16px;
     bottom: 0;
+    line-height: 32px;
+    color: gray;
+}
+
+.mute-button {
+    background-image: url(volume-max.png);
+    width: 32px;
+    height: 32px;
+    left: 4px;
+    top: 382px;
+}
+
+.mute-button.button-down {
+    background-image: url(volume-mute.png);
+}
+
+.logo {
+    width: 320px;
+    height: 200px;
+    background-image: url(logo.png);
 }
