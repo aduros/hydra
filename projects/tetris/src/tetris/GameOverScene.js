@@ -17,8 +17,8 @@ goog.inherits(tetris.GameOverScene, hydra.Scene);
 tetris.GameOverScene.prototype.load = function () {
 
 //    hydra.analytics.trackEvent("gameplay", "finishGame", tetris.ctx.board.score);
-
     hydra.account["lastGame"] = Date.now();
+    hydra.api.admob.showAd(tetris.adBanner);
 
     var scores = hydra.account["scores"];
     if (!scores) {

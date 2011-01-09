@@ -18,6 +18,7 @@ goog.require("hydra.task.RotateTo");
 goog.require("hydra.Button");
 goog.require("hydra.storage");
 goog.require("hydra.simulator");
+goog.require("hydra.api.admob");
 
 if (!hydra.simulator.supportsTouch) {
     hydra.simulator.init();
@@ -43,6 +44,12 @@ darkness.addTask(new hydra.task.Sequence([
 ]));
 intro.addEntity(darkness);
 hydra.director.pushScene(intro);
+
+if (window.innerHeight >= 460) {
+    tetris.adBanner = hydra.dom.div("ad-banner");
+    document.body.insertBefore(tetris.adBanner, hydra.director.getStage());
+    hydra.api.admob.init("a14d293a6f70b18", tetris.adBanner);
+}
 
 // Orientation handling
 function onOrientationChanged () {

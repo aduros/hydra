@@ -13,11 +13,14 @@ html, body {
     font-weight: 700;
     font-family: helvetica, sans-serif;
     color: #FFF;
-    -webkit-box-align: center;
-    -webkit-box-pack: center;
-    -moz-box-align: center;
-    -moz-box-pack: center;
     box-align: center;
+    -moz-box-align: center;
+    -webkit-box-align: center;
+    box-orient: vertical;
+    -moz-box-orient: vertical;
+    -webkit-box-orient: vertical;
+    -moz-box-pack: center;
+    -webkit-box-pack: center;
     box-pack: center;
     padding: 0;
     margin: 0;
@@ -40,6 +43,12 @@ html, body {
 /**
  * Game specific styles
  */
+
+.ad-banner {
+    min-width: 320px;
+    min-height: 48px;
+    position: relative;
+}
 
 @font-face {
     font-family: tobec;
