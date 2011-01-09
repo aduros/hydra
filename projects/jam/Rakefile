@@ -1,7 +1,7 @@
 import "../../hydra.rake"
 
 APP_NAME = "jam"
-DEBUG = true
-DEFAULT_TARGET = "opera"
+DEBUG = false
+DEFAULT_TARGET = "webkit"
 
 task :default => :deploy

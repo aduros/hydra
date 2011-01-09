@@ -20,6 +20,7 @@ goog.require("hydra.Button");
 goog.require("hydra.storage");
 goog.require("hydra.simulator");
 goog.require("hydra.sound");
+goog.require("hydra.api.admob");
 
 goog.require("ski.MainMenuScene");
 
@@ -35,6 +36,12 @@ var MainMenuScene = ski.MainMenuScene;
         hydra.director.init(new hydra.Scene("splash"));
 
         hydra.director.pushScene(new ski.AvalancheTransition(new MainMenuScene()));
+
+        //if (window.innerHeight >= 460) {
+            ski.adBanner = hydra.dom.div("ad-banner");
+            document.body.insertBefore(ski.adBanner, hydra.director.getStage());
+            hydra.api.admob.init("a14d2a4003c0e61", ski.adBanner);
+        //}
     }, 0);
 
     // Safari hacks

@@ -168,6 +168,7 @@ jam.PlayingScene.prototype.onGameOver = function () {
         hydra.account["best"] = best;
         hydra.storage.saveAccount();
     }
+    hydra.api.admob.showAd(jam.adBanner);
     hydra.director.replaceScene(
         confirm("Game over! You scored " + jam.ctx.board.score + " points." +
         "\n" +

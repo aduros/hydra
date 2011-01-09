@@ -6,7 +6,6 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -webkit-text-size-adjust: none;
-    -webkit-backface-visibility: hidden;
     position: absolute;
     white-space: nowrap;
     cursor: default;
@@ -24,9 +23,13 @@ html, body {
     -webkit-box-pack: center;
     -moz-box-pack: center;
     box-pack: center;
+    box-orient: vertical;
+    -moz-box-orient: vertical;
+    -webkit-box-orient: vertical;
     display: -webkit-box;
     display: -moz-box;
     display: box;
+    background-color: black;
 }
 
 #hydra-stage {
@@ -36,7 +39,6 @@ html, body {
     min-width: 320px;
     overflow: hidden;
     position: relative;
-    -webkit-perspective: 500;
 }
 
 #hydra-fps {
@@ -69,6 +71,12 @@ html, body {
 /**
  * Game specific styles
  */
+
+.ad-banner {
+    min-width: 320px;
+    min-height: 48px;
+    position: relative;
+}
 
 .robot {
     width: 24px;

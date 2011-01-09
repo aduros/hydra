@@ -24,6 +24,9 @@ html, body {
     -moz-box-pack: center;
     box-align: center;
     box-pack: center;
+    box-orient: vertical;
+    -moz-box-orient: vertical;
+    -webkit-box-orient: vertical;
     display: -webkit-box;
     display: -moz-box;
     display: box;
@@ -50,6 +53,12 @@ html, body {
 /**
  * Game specific styles
  */
+
+.ad-banner {
+    min-width: 320px;
+    min-height: 48px;
+    position: relative;
+}
 
 .board {
     width: 320px;

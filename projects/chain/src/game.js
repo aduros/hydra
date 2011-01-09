@@ -395,6 +395,7 @@ chain.ContinueScene.prototype.load = function () {
     quitButton.element.textContent = "End Game";
     quitButton.onTap = function () {
         chain.endGame();
+        hydra.api.admob.showAd(chain.adBanner);
         hydra.director.pushScene(new hydra.SlideTransition(new chain.MainMenuScene(), 0.8));
     };
     menu.addSprite(quitButton);

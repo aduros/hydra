@@ -21,6 +21,7 @@ goog.require("hydra.storage");
 goog.require("hydra.simulator");
 goog.require("hydra.sound");
 goog.require("hydra.api.playtomic");
+goog.require("hydra.api.admob");
 
 goog.require("chain.PlayingScene");
 goog.require("chain.MainMenuScene");
@@ -46,6 +47,14 @@ var MainMenuScene = chain.MainMenuScene;
         hydra.simulator.init();
     }
     hydra.director.init(new MainMenuScene());
+
+    // The correct minimum height should be 464 pixels, but that's too big for the iPhone when
+    // the status bar is shown. In this case, 4 pixels will be cut off the bottom, alas.
+    if (window.innerHeight >= 460) {
+        chain.adBanner = hydra.dom.div("ad-banner");
+        document.body.insertBefore(chain.adBanner, hydra.director.getStage());
+        hydra.api.admob.init("a14d2a42068bd5a", chain.adBanner);
+    }
 
     // Safari hacks
     // Looks like android requires it too
