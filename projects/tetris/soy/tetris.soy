@@ -12,9 +12,9 @@
 
 /** Paused scene */
 {template .scenePause}
-    <div class="label-pause">PAUSED</div>
-    <div class="button-resume button-big">Continue</div>
-    <div class="button-quit button-big">Main Menu</div>
+    <div class="label-pause">{msg desc="N/A"}PAUSED{/msg}</div>
+    <div class="button-resume button-big">{msg desc="N/A"}Continue{/msg}</div>
+    <div class="button-quit button-big">{msg desc="N/A"}Main Menu{/msg}</div>
 {/template}
 
 /**
@@ -22,19 +22,19 @@
  */
 {template .rating}
 {if $score < 10}
-    <span class="rating0">Awful</span>
+    <span class="rating0">{msg desc="N/A"}Awful{/msg}</span>
 {elseif $score < 1000}
-    <span class="rating1">Weak</span>
+    <span class="rating1">{msg desc="N/A"}Weak{/msg}</span>
 {elseif $score < 5000}
-    <span class="rating2">OK</span>
+    <span class="rating2">{msg desc="N/A"}OK{/msg}</span>
 {elseif $score < 12000}
-    <span class="rating3">Good</span>
+    <span class="rating3">{msg desc="N/A"}Good{/msg}</span>
 {elseif $score < 20000}
-    <span class="rating4">Super</span>
+    <span class="rating4">{msg desc="N/A"}Super{/msg}</span>
 {elseif $score < 30000}
-    <span class="rating5">Marvellous</span>
+    <span class="rating5">{msg desc="N/A"}Marvellous{/msg}</span>
 {else}
-    <span class="rating6">Blockstar</span>
+    <span class="rating6">{msg desc="N/A"}Blockstar{/msg}</span>
 {/if}
 {/template}
 
@@ -45,15 +45,15 @@
  */
 {template .sceneGameOver}
     <div class="label-gameover">
-        <div>Score: <span class="stat">{$score}</span></div>
-        <div>Level: <span class="stat">{$level}</span></div>
-        <div>Judges say... {call .rating data="all" /}</div>
+        <div>{msg desc="N/A"}Score:{/msg} <span class="stat">{$score}</span></div>
+        <div>{msg desc="N/A"}Level:{/msg} <span class="stat">{$level}</span></div>
+        <div>{msg desc="N/A"}Judges say...{/msg} {call .rating data="all" /}</div>
         {if $isHighScore}
-            <div class="label-highscore">It's a new high score!</div>
+            <div class="label-highscore">{msg desc="N/A"}It's a new high score!{/msg}</div>
         {/if}
     </div>
-    <div class="button-replay button-big">Replay</div>
-    <div class="button-quit button-big">Main Menu</div>
+    <div class="button-replay button-big">{msg desc="N/A"}Replay{/msg}</div>
+    <div class="button-quit button-big">{msg desc="N/A"}Main Menu{/msg}</div>
 {/template}
 
 /**
@@ -68,14 +68,14 @@
  *
  */
 {template .sceneOrientation}
-Rotate your device to play!
+{msg desc="N/A"}Rotate your device to play!{/msg}
 {/template}
 
 /** */
 {template .mainMenu}
     <div class="mainmenu">
-        <div class="button-play button-big">Play</div>
-        <div class="button-scores button-big">Scores</div>
+        <div class="button-play button-big">{msg desc="N/A"}Play{/msg}</div>
+        <div class="button-scores button-big">{msg desc="N/A"}Scores{/msg}</div>
     </div>
 {/template}
 
@@ -88,9 +88,9 @@ Rotate your device to play!
             <div class="{if isFirst($s)}label-highscore{/if}">
                 {$s.score} pts, {$s.date}
             </div>
-        {ifempty} <div>No scores recorded yet!</div>
+        {ifempty} <div>{msg desc="N/A"}No scores recorded yet!{/msg}</div>
         {/foreach}
-        <div class="button-back button-big">Back</div>
+        <div class="button-back button-big">{msg desc="N/A"}Back{/msg}</div>
     </div>
 {/template}
 
@@ -98,7 +98,7 @@ Rotate your device to play!
  * @param level
  */
 {template .levelUp}
-Level {$level}
+{msg desc="N/A"}Level{/msg} {$level}
 {/template}
 
 /**
@@ -107,22 +107,29 @@ Level {$level}
 {template .introTouch}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-Welcome to Block Dream!
+{msg desc="N/A"}Welcome to Block Dream!{/msg}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-DRAG your finger to move.
+{msg desc="N/A"}DRAG your finger to move.{/msg}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-TAP to rotate.
+{msg desc="N/A"}TAP to rotate.{/msg}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-FLICK down to drop!
+{msg desc="N/A"}FLICK down to drop!{/msg}
+{/template}
+
+/**
+ * 
+ */
+{template .lvl}
+{msg desc="N/A"}LVL{/msg}
 {/template}
 
 /**
@@ -131,20 +138,20 @@ FLICK down to drop!
 {template .introKeyboard}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-Welcome to Block Dream!
+{msg desc="N/A"}Welcome to Block Dream!{/msg}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-Use the arrow keys to move.
+{msg desc="N/A"}Use the arrow keys to move.{/msg}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-UP key to rotate.
+{msg desc="N/A"}UP key to rotate.{/msg}
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;
-DOWN key to drop!
+{msg desc="N/A"}DOWN key to drop!{/msg}
 {/template}
