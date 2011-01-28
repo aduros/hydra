@@ -430,7 +430,13 @@ chain.MainMenuScene.prototype.load = function () {
     ])));
     this.addEntity(explosionLayer);
 
-    this.addEntity(Sprite.div("logo"));
+    var logo = Sprite.div("logo");
+    this.addEntity(logo);
+
+    logo.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
+        new hydra.task.Delay(2),
+        new hydra.task.Shake(4, 1)
+    ])));
 
     var menu = Group.div("main menu");
     this.addEntity(menu);
