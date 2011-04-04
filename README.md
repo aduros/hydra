@@ -5,7 +5,7 @@ Hydra is a Javascript game engine for mobile browsers.
 
 Documentation is sorely lacking, but I've dogfooded it with a few games:
 
-* [Block Dream](http://aduros.emufarmers.com/html5/block-dream) ([source](http://github.com/aduros/hydra/tree/master/projects/tetris/))
+* [Block Dream](http://aduros.emufarmers.com/html5/blockdream) ([source](http://github.com/aduros/hydra/tree/master/projects/tetris/))
 * [Fruit Link](http://aduros.emufarmers.com/html5/fruitlink) ([source](http://github.com/aduros/hydra/tree/master/projects/jam/))
 * [Snow Bound](http://aduros.emufarmers.com/html5/snowbound) ([source](http://github.com/aduros/hydra/tree/master/projects/ski/))
 * [Blast Effect](http://aduros.emufarmers.com/html5/blasteffect) ([source](http://github.com/aduros/hydra/tree/master/projects/chain/), WebKit only for now)
