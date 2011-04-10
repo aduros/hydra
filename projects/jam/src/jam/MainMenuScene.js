@@ -61,27 +61,6 @@ jam.MainMenuScene.prototype.load = function () {
 
     this.addEntity(attract, ui.querySelector(".ui-attract"));
 
-    attract.addTask(new hydra.task.Repeat(new hydra.task.Sequence([
-        new hydra.task.CallFunction(function () {
-            //var p = jam.Piece.createRandom();
-            //if (p != jam.Piece.PRESETS[0]) {
-            //    for (var ii = 0, n = hydra.math.randomInt(0, 4); ii < n; ++ii) {
-            //        p = p.rotate();
-            //    }
-            //}
-            //var fallingPiece = new jam.PieceSprite(p);
-            //fallingPiece.setXY(hydra.math.randomInt(0, 320), 450);
-            //var z = hydra.math.random()*4+1;
-            //fallingPiece.setScale(2/z);
-            //fallingPiece.addTask(new hydra.task.Sequence([
-            //    hydra.task.MoveBy.linear(0, -480, z),
-            //    new hydra.task.SelfDestruct()
-            //]));
-            //attract.addSprite(fallingPiece);
-        }),
-        new hydra.task.Delay(0.1)
-    ])));
-
     var play = new hydra.Button(ui.querySelector(".button-play"));
     play.onTap = function () {
         var current = hydra.director.getCurrentScene();
