@@ -1,11 +1,3 @@
-* {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -webkit-text-size-adjust: none;
-    position: absolute;
-    cursor: default;
-}
-
 html, body {
     width: 100%;
     height: 100%;
@@ -34,6 +26,14 @@ html, body {
     height: 416px;
     overflow: hidden;
     position: relative;
+}
+
+#hydra-stage * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+    position: absolute;
+    cursor: default;
 }
 
 .button {
@@ -134,7 +134,7 @@ html, body {
 }
 
 .scene-gameover *, .scene-pause *, .mainmenu *, .scoremenu * {
-    position: static;
+    position: static !important;
 }
 
 .label-gameover {
@@ -253,7 +253,7 @@ html, body {
 }
 
 .scene-orientation :first-child {
-    position: static;
+    position: static !important;
     margin-top: 100px;
 }
 

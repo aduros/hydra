@@ -2,14 +2,6 @@
  * Standard Hydra styles
  */
 
-* {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -webkit-text-size-adjust: none;
-    position: absolute;
-    cursor: default;
-}
-
 html, body {
     width: 100%;
     height: 100%;
@@ -38,6 +30,14 @@ html, body {
     min-height: 368px; /*416px;*/
     overflow: hidden;
     position: relative;
+}
+
+#hydra-stage * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+    position: absolute;
+    cursor: default;
 }
 
 #hydra-fps {
@@ -248,7 +248,7 @@ html, body {
 }
 
 .menu * {
-    position: static;
+    position: static !important;
 }
 
 .main.menu {
