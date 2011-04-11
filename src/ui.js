@@ -1,8 +1,13 @@
 goog.provide("hydra.Button");
 goog.provide("hydra.ScrollPreventer");
+goog.provide("hydra.SplashScene");
 
-goog.require("hydra.Sprite");
+goog.require("hydra.director");
 goog.require("hydra.dom");
+goog.require("hydra.Sprite");
+goog.require("hydra.task.CallFunction");
+goog.require("hydra.task.Delay");
+goog.require("hydra.task.StyleTo");
 
 /**
  * @constructor
@@ -90,3 +95,20 @@ hydra.ScrollPreventer.prototype["handleEvent"] = function (event) {
         event.preventDefault();
     }
 }
+
+/**
+ * @constructor
+ * @extends hydra.Scene
+ * @param {hydra.Scene} nextScene
+ */
+hydra.SplashScene = function (nextScene) {
+    goog.base(this, "splash");
+    this.addTask(new hydra.task.Sequence([
+        new hydra.task.Delay(2),
+        new hydra.task.StyleTo.linear("opacity", "0", 1),
+        new hydra.task.CallFunction(function () {
+            hydra.director.unwindToScene(nextScene);
+        })
+    ]));
+}
+goog.inherits(hydra.SplashScene, hydra.Scene);
