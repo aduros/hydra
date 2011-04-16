@@ -468,8 +468,11 @@ chain.MainMenuScene.prototype.load = function () {
     };
     menu.addSprite(quitButton);
 
-    var credit = Sprite.div("credit");
+    var credit = new hydra.Button(hydra.dom.div("credit"));
     credit.element.textContent = "by @b_garcia";
+    credit.onTap = function () {
+        window.top.location = "http://twitter.com/b_garcia";
+    };
     this.addEntity(credit);
 }
 

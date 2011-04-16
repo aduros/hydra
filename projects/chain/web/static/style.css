@@ -243,6 +243,9 @@ html, body {
     line-height: 32px;
     color: gray;
 }
+.credit.button-down, .credit:hover {
+    color: black;
+}
 
 .mute-button {
     background-image: url(volume-max.png);
