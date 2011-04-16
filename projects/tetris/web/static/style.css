@@ -233,6 +233,7 @@ html, body {
 
 .credits.button-down, .credits:hover {
     color: #FFF;
+    cursor: pointer;
 }
 
 .ui-attract {
