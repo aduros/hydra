@@ -11,7 +11,18 @@ hydra.api.spil.submitScore = function (score) {
 }
 
 hydra.api.spil.showScores = function () {
-    window["SpilGames"]["Highscores"]["showScoreboard"](function () {});
+    try {
+        window["SpilGames"]["Highscores"]["showScoreboard"](function () {});
+    } catch (_) {
+    }
+}
+
+hydra.api.spil.getSplashURL = function () {
+    try {
+        return window["SpilGames"]["Settings"]["get"]("currentGameInfo")["splashScreen"] || null;
+    } catch (_) {
+        return null;
+    }
 }
 
 hydra.api.spil.exists = function () {
