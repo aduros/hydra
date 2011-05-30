@@ -100,9 +100,13 @@ hydra.ScrollPreventer.prototype["handleEvent"] = function (event) {
  * @constructor
  * @extends hydra.Scene
  * @param {hydra.Scene} nextScene
+ * @param {string=} backgroundUrl
  */
-hydra.SplashScene = function (nextScene) {
+hydra.SplashScene = function (nextScene, backgroundUrl) {
     goog.base(this, "splash");
+    if (backgroundUrl) {
+        this.root.element.style.setProperty("background-image", "url(" + backgroundUrl + ")");
+    }
     this.addTask(new hydra.task.Sequence([
         new hydra.task.Delay(2),
         new hydra.task.StyleTo.linear("opacity", "0", 1),
