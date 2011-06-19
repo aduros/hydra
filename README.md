@@ -48,11 +48,13 @@ born child. If you still want to try to tame it:
 
 Download the Closure submodule:
 
-        git submodule init git submodule update
+    git submodule init
+    git submodule update
 
 Use [Rake](http://rake.rubyforge.org/) to build an example project:
 
-        cd projects/chain rake
+    cd projects/chain
+    rake
 
 The "chain" (Blast Effect) and "ski" (Snow Bound) games are probably the best
 places to learn your way around by example.
