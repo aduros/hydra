@@ -39,3 +39,24 @@ Targets under development:
 
 * Opera Mobile 10
 * Desktop browsers: Internet Explorer 9
+
+Building
+--------
+
+Hydra is still undocumented, filled with broken glass, and will eat your first
+born child. If you still want to try to tame it:
+
+Download the Closure submodule:
+
+        git submodule init git submodule update
+
+Use [Rake](http://rake.rubyforge.org/) to build an example project:
+
+        cd projects/chain rake
+
+The "chain" (Blast Effect) and "ski" (Snow Bound) games are probably the best
+places to learn your way around by example.
+
+`rake` by itself will build the entire game for all supported browsers. For
+development, you can use `rake js` to only build for the browser specified by
+`DEFAULT_TARGET`. `rake css` will build only the CSS.
