@@ -40,6 +40,10 @@ ski.TRAIL_RADIUS = 4;
 
 ski.MAX_LIFE = 3;
 
+ski.accelerationX = 0;
+
+ski.fingerDown = false;
+
 /**
  * @constructor
  * @extends {Scene}
@@ -65,6 +69,16 @@ ski.PlayingScene = function () {
             self.movePlayer(event.clientX);
         });
     }
+
+    this.registerListener(window, "devicemotion", function (event) {
+        ski.accelerationX = Math.max(-10, Math.min(5*event["accelerationIncludingGravity"]["x"], 10));
+    });
+    this.registerListener(document.body, "touchstart", function (event) {
+        ski.fingerDown = true;
+    });
+    this.registerListener(document.body, "touchend", function (event) {
+        ski.fingerDown = (event.touches.length > 0);
+    });
 
     this.playerState = PlayerState.NORMAL;
 
@@ -174,7 +188,7 @@ ski.PlayingScene.prototype.setFrame = function (frame) {
 
 ski.PlayingScene.prototype.movePlayer = function (x) {
     if (this.isCurrentScene() && this.playerState != PlayerState.DEAD) {
-        this.playerChassis.setX(x);
+        this.playerChassis.setX(Math.max(0, Math.min(x, window.innerWidth)));
     }
 }
 
@@ -194,6 +208,11 @@ ski.PlayingScene.prototype.onResize = function () {
  */
 ski.PlayingScene.prototype.update = function (dt) {
     goog.base(this, "update", dt);
+
+    // If the player isn't touching the screen, apply gravity
+    if (!ski.fingerDown && ski.accelerationX != 0) {
+        this.movePlayer(this.playerChassis.getX() + ski.accelerationX);
+    }
 
     if (this.playerState == PlayerState.DEAD) {
         return;
