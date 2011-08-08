@@ -1,3 +1,7 @@
+//
+// Snow Bound - HTML5 mobile game built with Hydra
+// https://github.com/aduros/hydra/blob/master/projects/LICENSE.txt
+
 goog.provide("ski.PlayingScene");
 goog.provide("ski.MainMenuScene");
 
