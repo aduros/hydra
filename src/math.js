@@ -1,3 +1,7 @@
+//
+// Hydra - HTML5 mobile game engine
+// https://github.com/aduros/hydra/blob/master/LICENSE.txt
+
 goog.provide("hydra.interpolators");
 goog.provide("hydra.math");
 goog.provide("hydra.Random");

@@ -1,3 +1,7 @@
+//
+// Hydra - HTML5 mobile game engine
+// https://github.com/aduros/hydra/blob/master/LICENSE.txt
+
 goog.provide("hydra.Transition");
 goog.provide("hydra.SlideTransition");
 goog.provide("hydra.FadeTransition");
