@@ -25,8 +25,6 @@ hydra.simulator.identifier = 0;
  * @param {Event} e
  */
 hydra.simulator.handleMouse = function (e) {
-    e.preventDefault();
-
     var touchType = "";
     switch (e.type) {
         case "mousedown":
