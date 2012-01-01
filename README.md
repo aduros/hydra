@@ -10,6 +10,13 @@ Documentation is sorely lacking, but I've dogfooded it with a few games:
 * [Snow Bound](http://aduros.emufarmers.com/html5/snowbound) ([source](http://github.com/aduros/hydra/tree/master/projects/ski/))
 * [Blast Effect](http://aduros.emufarmers.com/html5/blasteffect) ([source](http://github.com/aduros/hydra/tree/master/projects/chain/), WebKit only for now)
 
+Status
+------
+
+Work on Hydra has stopped, but the lessons learned on this project are going toward
+[Flambe](https://github.com/aduros/flambe), a framework for rapid development of mobile and desktop
+games.
+
 Design
 ------
 
