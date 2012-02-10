@@ -4,12 +4,7 @@
 
 goog.provide("hydra.simulator");
 
-hydra.simulator.supportsTouch = true;
-try {
-    document.createEvent("TouchEvent");
-} catch (_) {
-    hydra.simulator.supportsTouch = false;
-}
+hydra.simulator.supportsTouch = ("ontouchstart" in window);
 
 /**
  * @private
