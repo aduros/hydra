@@ -20,15 +20,16 @@ task :soy do
     mkdir_p("build/soy");
 
     puts("Compiling templates...");
-    system("java -jar '" + HYDRA_HOME + "/tools/SoyToJsSrcCompiler.jar'" +
-        " --codeStyle concat --shouldGenerateJsdoc --shouldProvideRequireSoyNamespaces" +
-        " --outputPathFormat build/soy/{INPUT_FILE_NAME_NO_EXT}.js" +
-        " soy/*.soy");
+    system('java -jar "' + HYDRA_HOME + '/tools/SoyToJsSrcCompiler.jar"' +
+        ' --codeStyle concat --shouldGenerateJsdoc --shouldProvideRequireSoyNamespaces' +
+        ' --outputPathFormat "build/soy/{INPUT_FILE_NAME_NO_EXT}.js"' +
+        ' soy/*.soy');
 end
 
 task :css do
     puts("Compressing CSS...");
-    system("java -jar '" + HYDRA_HOME + "/tools/yuicompressor.jar' web/static/style.css -o build/deploy/static/style.css");
+    system('java -jar "' + HYDRA_HOME + '/tools/yuicompressor.jar"' +
+       ' web/static/style.css -o build/deploy/static/style.css');
 end
 
 def run_compiler (defines, entry_point, output_file)
@@ -50,15 +51,15 @@ def run_compiler (defines, entry_point, output_file)
     end
 
     system(
-        "'" + HYDRA_HOME + "/closure/closure/bin/build/closurebuilder.py' --namespace '" + entry_point + "'" +
-        " " + LIBS.map {|path| "'--root=" + path + "'" }.join(" ") + 
-        " -o compiled -c '" + HYDRA_HOME + "/tools/compiler.jar'" +
-        " " + options.map {|key, value| "-f '--" + key + "=" + value + "'" }.join(" ") +
-        " " + defines.map {|key, value| "-f \"--define=" + key + "=" + value + "\""}.join(" ") +
-        " " + errors.map {|error| "-f --jscomp_error=" + error}.join(" ") +
-        " " + warnings.map {|warning| "-f --jscomp_warning=" + warning}.join(" ") +
-        " " + EXTERNS.map {|dir| FileList.new(dir+"/**/*.js").map {|file| "-f --externs=" + file}.join(" ")}.join(" ") +
-        " '--output_file=" + output_file + "'"
+        '"' + HYDRA_HOME + '/closure/closure/bin/build/closurebuilder.py" --namespace "' + entry_point + '"' +
+        ' ' + LIBS.map {|path| '"--root=' + path + '"' }.join(' ') +
+        ' -o compiled -c "' + HYDRA_HOME + '/tools/compiler.jar"' +
+        ' ' + options.map {|key, value| '-f "--' + key + '=' + value + '"' }.join(' ') +
+        ' ' + defines.map {|key, value| '-f "--define=' + key + '=' + value + '"'}.join(' ') +
+        ' ' + errors.map {|error| '-f --jscomp_error=' + error}.join(' ') +
+        ' ' + warnings.map {|warning| '-f --jscomp_warning=' + warning}.join(' ') +
+        ' ' + EXTERNS.map {|dir| FileList.new(dir+"/**/*.js").map {|file| '-f --externs=' + file}.join(' ')}.join(' ') +
+        ' "--output_file=' + output_file + '"'
         );
 end
 
