@@ -42,11 +42,6 @@ Hydra currently has three heads:
 * Android 2.1+
 * Desktop browsers: Chrome, Safari, Firefox, Opera
 
-Targets under development:
-
-* Opera Mobile 10
-* Desktop browsers: Internet Explorer 9
-
 Building
 --------
 
