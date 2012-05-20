@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Build a fresh release build
+rake clean
+rake || exit
+
+# Deploy it
+rsync -avz --delete build/deploy/ catdap:~/web/blast-effect

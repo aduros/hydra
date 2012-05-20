@@ -1,0 +1,8 @@
+#!/bin/sh
+
+for i in jam ski chain tetris ; do
+    cd $i
+    rake clean
+    rake
+    cd ..
+done
