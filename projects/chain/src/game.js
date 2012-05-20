@@ -461,14 +461,9 @@ chain.MainMenuScene.prototype.load = function () {
     menu.addSprite(playButton);
 
     var quitButton = Button.div("action-button");
-    quitButton.element.textContent = "Quit";
+    quitButton.element.textContent = "More Games";
     quitButton.onTap = function () {
-        if (window.history.length > 1) {
-            window.history.back();
-        } else {
-            window.close();
-            window.location = "http://google.com"; // We'll get here if close() was refused
-        }
+        window.location = "https://aduros.com/games/";
     };
     menu.addSprite(quitButton);
 

@@ -108,6 +108,13 @@ tetris.MainMenuScene.prototype.createMainSprite = function (animate) {
     };
 //    mainSprite.addSprite(scores);
     scores.activate(this); // HACK
+
+    var moreGames = new hydra.Button(mainSprite.element.querySelector(".button-more"));
+    moreGames.onTap = function () {
+        window.location = "https://aduros.com/games";
+    };
+//    mainSprite.addSprite(moreGames);
+    moreGames.activate(this); // HACK
 }
 
 tetris.MainMenuScene.prototype.createScoreSprite = function () {

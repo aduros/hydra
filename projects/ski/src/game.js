@@ -635,7 +635,7 @@ ski.MainMenuScene.prototype.load = function () {
         "<div class='main menu'>" +
             "<div class='logo'></div>" +
             "<div class='action-button'>Play</div>" +
-            "<div class='action-button'>Quit</div>" +
+            "<div class='action-button'>More Games</div>" +
         "</div>");
     this.addEntity(new Sprite(menuDiv));
 
@@ -647,12 +647,7 @@ ski.MainMenuScene.prototype.load = function () {
 
     var quitButton = new Button(menuDiv.getElementsByClassName("action-button")[1]);
     quitButton.onTap = function () {
-        if (window.history.length > 1) {
-            window.history.back();
-        } else {
-            window.close();
-            window.location = "http://google.com"; // We'll get here if close() was refused
-        }
+        window.location = "https://aduros.com/games/";
     };
     this.addEntity(quitButton, null);
 

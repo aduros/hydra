@@ -74,6 +74,12 @@ jam.MainMenuScene.prototype.load = function () {
         hydra.director.pushScene(new hydra.SlideTransition(new jam.PlayingScene(), 1));
     };
     play.activate(this); // HACK
+
+    var moreGames = new hydra.Button(ui.querySelector(".button-more"));
+    moreGames.onTap = function () {
+        window.location = "https://aduros.com/games/";
+    };
+    moreGames.activate(this); // HACK
 }
 
 //jam.MainMenuScene.prototype.createScoreSprite = function () {

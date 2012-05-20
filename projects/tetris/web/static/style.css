@@ -198,11 +198,11 @@ html, body {
     transform: translate(0, 2px);
 }
 
-.button-quit, .button-scores, .button-back {
+.button-quit, .button-scores, .button-more, .button-back {
     background-color: #333;
 }
 
-.button-quit.button-down, .button-scores.button-down, .button-back.button-down {
+.button-quit.button-down, .button-scores.button-down, .button-more.button-down, .button-back.button-down {
     background-color: #222;
 }
 
