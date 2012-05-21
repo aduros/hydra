@@ -24,7 +24,6 @@ goog.require("hydra.Button");
 goog.require("hydra.storage");
 goog.require("hydra.simulator");
 goog.require("hydra.sound");
-goog.require("hydra.api.playtomic");
 goog.require("hydra.api.admob");
 
 goog.require("chain.PlayingScene");
@@ -35,17 +34,6 @@ var PlayingScene = chain.PlayingScene;
 var MainMenuScene = chain.MainMenuScene;
 
 (function () {
-    if (!goog.DEBUG) {
-        hydra.api.playtomic.init(1403, "d60e926aad9b4055");
-    }
-    //window["Playtomic"]["Leaderboards"]["Submit"]({
-    //    "Name": "testycakes",
-    //    "Points": Math.random()*500
-    //}, "highscores");
-    //window["Playtomic"]["Leaderboards"]["List"]({
-    //    "Name": "testycakes",
-    //    "Points": Math.random()*500
-
     hydra.storage.loadAccount();
     if (!hydra.simulator.supportsTouch) {
         hydra.simulator.init();

@@ -18,7 +18,20 @@
   <![endif]-->
   <div id="hydra-stage"></div>
   <div id="hydra-fps"></div>
-  <script src="http://api.playtomic.com/js/playtomic.v1.0.js"></script>
+  <script>
+    if (typeof _gaq != "object") {
+      var _gaq = [];
+      (function() {
+        var ga = document.createElement("script"); ga.async = true;
+        ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+        var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    }
+    _gaq.push(
+      ["bruno._setAccount", "UA-9490853-12"],
+      ["bruno._setCookiePath", location.href],
+      ["bruno._trackPageview"]);
+  </script>
   <script src="static/launcher.js"></script>
   <noscript>Turn on Javascript to play!</noscript>
 </body>
